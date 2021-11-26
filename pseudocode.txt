@@ -1,0 +1,25 @@
+
+df[capacidade] = vcpu #Inserir nova coluna no dataframe com a capacidade (de acordo como tipo de instancia)
+df[adi] = 0 #acrescentar uma coluna com o adi
+capacidade_extra = 0 # tamanho do passo em uma linha
+step_size = 2
+
+
+
+for linha in dataframe:
+	df[capacidade] = df[capacidade] + capacidade_extra # Faz a soma para ver em determinado momento como qual a capacidade total (capacidade da maquina + o tamanho do passo que foi necessário no tempo anterior)
+	utilização = average/df[capacidade] * 100 # Calcula a utilização de acordo com a formula de Marcos e retorna em porcentagem)
+
+	if utilização > u: # se a utilização for maior que o limite superior
+          	adi = utilização - u #calcula o adi
+		capacidade_extra = step_size #incrementa o step_size**************
+        if else utilização < l:#se a utilização for menor que o limite inferior
+		adi = l - utilização
+		capacidade_extra = step_size * -1
+	else: # dentro do limite
+		adi = 0
+		capacidade_extra = 0
+	df[adi] = adi
+
+# adi final
+sum(df[adi])
