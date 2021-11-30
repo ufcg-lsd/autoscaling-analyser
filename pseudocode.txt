@@ -7,7 +7,7 @@ step_size = 2
 
 
 for linha in dataframe:
-	df[capacidade] = df[capacidade] + capacidade_extra # Faz a soma para ver em determinado momento como qual a capacidade total (capacidade da maquina + o tamanho do passo que foi necessário no tempo anterior)
+	df[capacidade] = df[capacidade anterior] + capacidade_extra # Faz a soma para ver em determinado momento como qual a capacidade total (capacidade da maquina + o tamanho do passo que foi necessário no tempo anterior)
 	utilização = average/df[capacidade] * 100 # Calcula a utilização de acordo com a formula de Marcos e retorna em porcentagem)
 
 	if utilização > u: # se a utilização for maior que o limite superior

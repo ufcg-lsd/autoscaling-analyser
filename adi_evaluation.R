@@ -9,20 +9,21 @@ data <- raw_data[,c("timestamp","InstanceType","Average")]
 
 # Add new column capacity based on the instance type
 data <- data %>% 
-  dplyr::mutate(Capacity = dplyr::case_when(InstanceType == "t2.medium" ~ 2,
-                                              InstanceType == "t2.micro" ~ 1,
-                                              InstanceType == "c5.large" ~ 2,
-                                              InstanceType == "c5.xlarge" ~ 4,
-                                              InstanceType == "m5d.large" ~ 2,
-                                              InstanceType == "m5d.xlarge" ~ 4,
-                                              InstanceType == "r5.2xlarge" ~ 8,
-                                              InstanceType == "t3.micro" ~ 2
+  dplyr::mutate(Capacity = dplyr::case_when(
+    InstanceType == "t2.medium" ~ 2,
+    InstanceType == "t2.micro" ~ 1,
+    InstanceType == "c5.large" ~ 2,
+    InstanceType == "c5.xlarge" ~ 4,
+    InstanceType == "m5d.large" ~ 2,
+    InstanceType == "m5d.xlarge" ~ 4,
+    InstanceType == "r5.2xlarge" ~ 8,
+    InstanceType == "t3.micro" ~ 2
   ))
 
 # Set test parameters
 step_size <- 2
-upper_bound = 60
-lower_bound = 39
+upper_bound <- 60
+lower_bound <- 39
 
 # Auxiliary variables
 previous <- 0
