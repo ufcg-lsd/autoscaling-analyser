@@ -4,10 +4,10 @@ library(dplyr)
 # Read csv
 raw_data <- read.csv("data/util_data.csv")
 
-# Select only the columns timestamp, InstanceType and Average
+# Select only the columns: timestamp, InstanceType and Average.
 data <- raw_data[,c("timestamp","InstanceType","Average")]
 
-# Add new column capacity
+# Add new column capacity based on the instance type
 data <- data %>% 
   dplyr::mutate(Capacity = dplyr::case_when(InstanceType == "t2.medium" ~ 2,
                                               InstanceType == "t2.micro" ~ 1,
@@ -19,44 +19,47 @@ data <- data %>%
                                               InstanceType == "t3.micro" ~ 2
   ))
 
-capacidade_extra <- 0
+# Set test parameters
 step_size <- 2
 upper_bound = 60
 lower_bound = 39
-previous <- 0
 
+# Auxiliary variables
+previous <- 0
+extra_capacity <- 0
+
+# Loop thought each line on the data frame
 for (i in 1:dim(data)[1]) {
-  data[["Capacity"]][i] <- data[["Capacity"]][i-previous] + capacidade_extra
+  # Calculate the capacity based on the previous one
+  data[["Capacity"]][i] <- data[["Capacity"]][i-previous] + extra_capacity
+  # Calculate utilization level by percentage
   data[["Utilization"]][i] <- data[["Average"]][i] / data[["Capacity"]][i] * 100
   
   if (data[["Utilization"]][i] > upper_bound) {
     # Utilization level greater than upper bound
-    print ("GREATER")
     data[["ADI"]][i] <- data[["Utilization"]][i] - upper_bound
-    capacidade_extra <- 2
+    extra_capacity <- 2
   
   } else if (data[["Utilization"]][i] < lower_bound) {
     # Utilization level less than lower bound
-    print ("LESS")
     data[["ADI"]][i] <- lower_bound - data[["Utilization"]][i]
     
     if (data[["Capacity"]][i] > 2) { # Avoid zero capacity
-      capacidade_extra <- -2 
+      extra_capacity <- -2 
     } else {
-      capacidade_extra <- 0
+      extra_capacity <- 0
     }
 
   } else {
     # Utilization level between desired limit
-    print ("BETWEEN")
     data[["ADI"]][i] <- 0
-    capacidade_extra = 0
+    extra_capacity = 0
   }
   
   if (i == 1) {
     previous <- 1
   }
-  
+ 
 }
 
 # Print sum of all ADIs
