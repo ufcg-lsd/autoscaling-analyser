@@ -13,5 +13,6 @@ processing_data <- function(filename){
     mutate(Used = InstanceCapacity * Average / 100) %>%
     group_by(timestamp) %>%
     summarise(Cores = sum(Used))
+  
   return(data)
 }

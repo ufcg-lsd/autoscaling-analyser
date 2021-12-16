@@ -1,5 +1,5 @@
 reactive_static_policy <- function(data, initial_allocated_cores, lower_bound,
-                                   upper_bound){
+                                   upper_bound, step_size){
   cores_allocated <- initial_allocated_cores
   
   for(row in 1:nrow(data)) {
@@ -9,10 +9,10 @@ reactive_static_policy <- function(data, initial_allocated_cores, lower_bound,
     data[row, "AllocatedCores"] <- cores_allocated
     
     if(system_utilization > upper_bound){
-      cores_allocated <- cores_allocated + 2
+      cores_allocated <- cores_allocated + step_size
     }
     else if(system_utilization < lower_bound){
-      cores_allocated <- cores_allocated - 2
+      cores_allocated <- cores_allocated - step_size
     }
     else{
       cores_allocated <- cores_allocated

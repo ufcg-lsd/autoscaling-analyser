@@ -10,9 +10,11 @@ data <- processing_data("data/util_data.csv")
 initial_allocated_cores <- 9
 lower_bound <- 39
 upper_bound <- 60
+step_size <- 2
 
 data_with_utilization <- reactive_static_policy(data, initial_allocated_cores,
-                                                lower_bound, upper_bound)
+                                                lower_bound, upper_bound,
+                                                step_size)
 data_with_adi <- calculate_adi(data_with_utilization, lower_bound, upper_bound)
 
 sum(data_with_adi["ADI"])
