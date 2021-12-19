@@ -2,23 +2,20 @@ library(dplyr)
 library(testthat)
 
 source(here::here("src/data_processing.R"))
-source(here::here("src/reactive_static_policy.R"))
+source(here::here("src/auto_scaling_algorithm.R"))
 
+# Load data files
 data <- processing_data("data/util_data.csv")
+data_decreasing <- read.csv("data/decreasing_data.csv")
 
-# Global test parameters
-initial_allocated_cores <- 10
-lower_bound <- 39
-upper_bound <- 60
-step_size <- 2
+policy_parameters <- data.frame(lower_bound = 39, upper_bound = 60,
+                                step_size = 2)
 
 start_time <- Sys.time()
-
-policy_data <- reactive_static_policy(data, initial_allocated_cores,
-                                      lower_bound, upper_bound,
-                                      step_size)
-
+policy_data <- auto_scaling_algorithm(data, initial_allocated_cores = 10,
+                                      policy_parameters)
 end_time <- Sys.time()
+
 running_time <- end_time - start_time
 print (running_time) 
 
@@ -44,6 +41,29 @@ test_that("AllocatedCores test", {
   expect_equal(policy_data$AllocatedCores[39], digits=2, 10)
   expect_equal(policy_data$AllocatedCores[48], digits=2, 10)
   expect_equal(policy_data$AllocatedCores[49], digits=2, 8)
+})
+
+
+policy_data <- auto_scaling_algorithm(data, initial_allocated_cores = 2,
+                                      policy_parameters)
+
+test_that("SystemUtilization over 100%", {
+  expect_equal(policy_data$SystemUtilization[1], 100)
+  expect_equal(policy_data$SystemUtilization[2], 100)
+})
+
+test_that("Exceeded cores", {
+  expect_equal(round(policy_data$ExceededCores[1], digits=2), 2.50)
+  expect_equal(round(policy_data$ExceededCores[2], digits=2), 0.06)
+})
+
+policy_data <- auto_scaling_algorithm(data_decreasing,
+                                      initial_allocated_cores = 12,
+                                      policy_parameters)
+
+test_that("SystemUtilization 0%", {
+  expect_equal(policy_data$SystemUtilization[40], 0)
+  expect_equal(policy_data$SystemUtilization[41], 0)
 })
 
 

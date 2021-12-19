@@ -2,33 +2,39 @@ library(dplyr)
 library(testthat)
 
 source(here::here("src/data_processing.R"))
-source(here::here("src/reactive_static_policy.R"))
+source(here::here("src/auto_scaling_algorithm.R"))
 source(here::here("src/calculate_adi.R"))
+source(here::here("tests/setup_test.R"))
 
+# Load data files
 data <- processing_data("data/util_data.csv")
+decreasing_data <- read.csv("data/decreasing_data.csv")
 
-adi_sum <- function(data, initial_allocated_cores, lower_bound, upper_bound,
-                    step_size) {
-  data_with_utilization <- reactive_static_policy(data, initial_allocated_cores,
-                                                  lower_bound, upper_bound,
-                                                  step_size)
-  data_with_adi <- calculate_adi(data_with_utilization, lower_bound, upper_bound)
-  return (sum(data_with_adi["ADI"]))
-}
+policy_parameters <- data.frame(lower_bound = 39, upper_bound = 60,
+                                step_size = 2)
 
-# Test parameters
-upper_bound <- 60
-lower_bound <- 39
-step_size <- 2
-
-test_that("ADI sum", {
+test_that("ADI normal utilization", {
   expect_equal(round(
-    adi_sum(data, 9, lower_bound, upper_bound, step_size), digits=2), 3.67)
+    adi_sum(data, 9, policy_parameters), digits=2), 3.67)
   expect_equal(round(
-    adi_sum(data, 10, lower_bound, upper_bound, step_size), digits=2), 15.23)
+    adi_sum(data, 10, policy_parameters), digits=2), 15.23)
   expect_equal(round(
-    adi_sum(data, 8, lower_bound, upper_bound, step_size), digits=2), 18.01)
+    adi_sum(data, 8, policy_parameters), digits=2), 18.01)
 })
 
-# Conclusion: 9 initial allocated cores is the best option
-# for this data!
+test_that("ADI overutilization", {
+  expect_equal(round(
+    adi_sum(data, 2, policy_parameters), digits=2), 231.87)
+  expect_equal(round(
+    adi_sum(data, 4, policy_parameters), digits=2), 78.22)
+})
+
+test_that("ADI underutilization", {
+  expect_equal(round(
+    adi_sum(decreasing_data, 14, policy_parameters), digits=2), 267.40)
+  expect_equal(round(
+    adi_sum(decreasing_data, 15, policy_parameters), digits=2), 234.04)
+})
+
+
+
