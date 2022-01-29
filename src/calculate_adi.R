@@ -7,7 +7,7 @@ calculate_adi <- function(data, lower_bound, upper_bound){
       if (data[row, "ExceededCores"] > 0) {
         over_utilization <- data[row, "ExceededCores"] /
                             data[row, "AllocatedCores"] * 100
-        adi <- adi + over_utilization
+        data[row, "OverUtilization"] <- over_utilization
       }
       
     }else if(data[row,"SystemUtilization"] < lower_bound){
