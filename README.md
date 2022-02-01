@@ -28,11 +28,29 @@ You can add new data files, or you can use the one that we offer as sample:
 
 You can run the script on your terminal on the repo root directory, with the following command:
 ```
-$ R -f src/main.R
+$ Rscript src/main.R data/decreasing_data.csv
 ```
-Or instead, we recommend you to use [RStudio IDE](https://www.rstudio.com/products/rstudio/download/)
+Where the second argument is the path to the data file.
+
+We recommend you to use [RStudio IDE](https://www.rstudio.com/products/rstudio/download/)
 which has all the tools you need to develop using R.
 
+### Data files
+
+You can add more data files to calculate the ADI, storing them on de data
+directory.
+The file has to be a csv format and is composed of only two columns: Cores and timestamp.
+Every line of the Cores column is filled with floating numbers,
+representing the amount of cores used by a given application in each timestamp.
+The timestamp date format is currently up to you, since isn't not used yet by
+the algorithm, but it's useful for reference.
+
+| timestamp   | Cores     |
+|:------------|:----------| 
+| 1617228000  | 12.22     | 
+| 1617228060  | 10.10     |   
+| 1617228120  | 8.64      |    
+| ...         | ...       |
 
 ### Organization of the repo
 ```

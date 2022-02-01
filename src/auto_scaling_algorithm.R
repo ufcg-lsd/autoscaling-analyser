@@ -24,10 +24,9 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     
     # Minimum allocated cores is the step size
     cores_allocated <- max(cores_allocated + new_cores,
-                           policy_parameters[["step_size"]]) 
+                           policy_parameters[["step_size"]])
     data[row, "NewCores"] <- new_cores
   }
   
-  return(data) 
+  return(data)
 }
-

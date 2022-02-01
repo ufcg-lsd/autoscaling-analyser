@@ -1,12 +1,4 @@
-library(dplyr)
-library(testthat)
-
-source(here::here("src/data_processing.R"))
-source(here::here("src/auto_scaling_algorithm.R"))
-
-# Load data files
-data <- processing_data("data/util_data.csv")
-data_decreasing <- read.csv("data/decreasing_data.csv")
+source(here::here("tests/setup_test.R"))
 
 policy_parameters <- data.frame(lower_bound = 39, upper_bound = 60,
                                 step_size = 2)
