@@ -1,0 +1,5 @@
+---
+ initial_allocated_cores: 2
+ lower_bound: 39
+ upper_bound: 60
+ step_size: 2
