@@ -1,16 +1,23 @@
 library(dplyr)
+library(yaml)
 
 source(here::here("src/data_processing.R"))
 source(here::here("src/auto_scaling_algorithm.R"))
 source(here::here("src/calculate_adi.R"))
 
+# Data files
 args = commandArgs(trailingOnly=TRUE)
 input_data <- read.csv(args[1])
 util_data <- processing_data("data/util_data.csv")
 
+# Config file
+configs <- yaml.load_file("config.yaml")
+
 # Test parameters
-initial_allocated_cores <- 2
-policy_parameters <- data.frame(lower_bound = 39,upper_bound = 60,step_size = 2)
+initial_allocated_cores <- configs$initial_allocated_cores
+policy_parameters <- data.frame(lower_bound = configs$lower_bound,
+                                upper_bound = configs$upper_bound,
+                                step_size = configs$step_size)
 
 # Play around with util data
 #data_with_auto_scaling <- auto_scaling_algorithm(util_data, initial_allocated_cores,

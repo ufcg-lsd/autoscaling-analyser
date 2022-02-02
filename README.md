@@ -35,11 +35,22 @@ Where the second argument is the path to the data file.
 We recommend you to use [RStudio IDE](https://www.rstudio.com/products/rstudio/download/)
 which has all the tools you need to develop using R.
 
+### Configuration file
+
+Under the root directory there is a configuration file with the following parameters:
+
+- **Initial allocated cores**: the amount of cores available initially for your application
+to run. During the simulation, the auto scaling algorithm will increase or decrease
+this value, based on the boundaries that you set.
+- **Lower bound**: The minimum utilization level percentage of your application's cores
+- **Upper bound**: The maximum utilization level percentage of your application's cores
+- **Step size**: The amount of cores you want to add or remove on each auto scaling operation.
+
 ### Data files
 
-You can add more data files to calculate the ADI, storing them on de data
+You can add more data files to calculate the ADI, storing them on the data
 directory.
-The file has to be a csv format and is composed of only two columns: Cores and timestamp.
+The file has to be in csv format and is composed of two columns: Cores and timestamp.
 Every line of the Cores column is filled with floating numbers,
 representing the amount of cores used by a given application in each timestamp.
 The timestamp date format is currently up to you, since isn't not used yet by
