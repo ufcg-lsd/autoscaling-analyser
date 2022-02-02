@@ -28,7 +28,7 @@ You can add new data files, or you can use the one that we offer as sample:
 
 You can run the script on your terminal on the repo root directory, with the following command:
 ```
-$ Rscript src/main.R data/decreasing_data.csv
+$ Rscript src/main.R data/$input_data
 ```
 Where the second argument is the path to the data file.
 
