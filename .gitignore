@@ -1,5 +1,7 @@
 .Rproj.user
-*.Rproj
 .Rhistory
 .RData
 .Ruserdata
+*.html
+data/util_data.csv
+
