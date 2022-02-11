@@ -3,3 +3,4 @@
  lower_bound: 39
  upper_bound: 60
  step_size: 2
+ data_source: 'azure'

@@ -4,4 +4,5 @@
 .Ruserdata
 *.html
 data/util_data.csv
+data/azure
 
