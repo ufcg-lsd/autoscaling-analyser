@@ -46,15 +46,15 @@ In addition, an output file is also generated which will be stored under the
 The output file will contain a table with the following columns:
 
 - **timestamp**: Timestamp column from input data.
-- **Cores**: Requested cores for an application (Cores column from input data).
-- **ExceededCores**: Amount of cores that are requested for the application 
-minus the actual allocated cores.
-- **SystemUtilization**: Percentage of requested cores over allocated cores.
+- **Cores**: Demanded cores for an application (Cores column from input data).
+- **ExceededCores**: Amount of cores that is not supported by the allocated
+infrastructure.
+- **SystemUtilization**: Percentage of demanded cores over allocated cores.
 - **AllocatedCores**: Actual allocated cores in the infrastructure.
 - **NewCores**: New cores with will be allocated on the next timestamp to meet
 the current system utilization requirement. It's value can be either zero, 
 the step size or -1 multiplied by the step size.
-- **OverUtilization**: Percentage of requested cores over exceeded cores.
+- **OverUtilization**: Percentage of demanded cores over exceeded cores.
 - **ADI**: ADI metric on each timestamp.
 
 ### Configuration file
