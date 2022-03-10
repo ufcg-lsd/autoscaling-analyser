@@ -6,13 +6,16 @@ processing_data <- function(filename){
       InstanceType == "t2.micro" ~ 1,
       InstanceType == "c5.large" ~ 2,
       InstanceType == "c5.xlarge" ~ 4,
+      InstanceType == "c4.xlarge" ~ 4,
       InstanceType == "m5d.large" ~ 2,
       InstanceType == "m5d.xlarge" ~ 4,
       InstanceType == "r5.2xlarge" ~ 8,
       InstanceType == "t3.micro" ~ 2)) %>%
     mutate(Used = InstanceCapacity * Average / 100) %>%
     group_by(timestamp) %>%
-    summarise(Cores = sum(Used))
+    summarise(Cores = sum(Used),
+              Allocated = sum(InstanceCapacity),
+              SystemRealUtilization = min((Cores/Allocated) * 100, 100))
   
   return(data)
 }
