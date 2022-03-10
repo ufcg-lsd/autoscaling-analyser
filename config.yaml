@@ -1,5 +1,9 @@
 ---
  initial_allocated_cores: 2
- lower_bound: 39
- upper_bound: 60
- step_size: 2
+ # Configs for master-data-api
+ lower_bound: 25
+ upper_bound: 50
+ up_step_size: 16
+ down_step_size: 4
+ min_cap: 32
+ max_cap: 240

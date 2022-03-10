@@ -20,11 +20,13 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     new_cores <- reactive_static_policy(system_utilization,
                                         policy_parameters[["upper_bound"]],
                                         policy_parameters[["lower_bound"]],
-                                        policy_parameters[["step_size"]])
+                                        policy_parameters[["up_step_size"]],
+                                        policy_parameters[["down_step_size"]])
     
-    # Minimum allocated cores is the step size
-    cores_allocated <- max(cores_allocated + new_cores,
-                           policy_parameters[["step_size"]])
+    # Minimum allocated cores is the min_cap, and maximum is max_cap
+    cores_allocated <- min(max(cores_allocated + new_cores,
+                           policy_parameters[["min_cap"]]),
+                           policy_parameters[["max_cap"]])
     data[row, "NewCores"] <- new_cores
   }
   
