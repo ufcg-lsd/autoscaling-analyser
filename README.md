@@ -14,6 +14,10 @@ unacceptable QoS and resource underutilisation."
 ### Installation
 
 You can install R software for free [here](https://www.r-project.org/).
+
+We recommend you to use [RStudio IDE](https://www.rstudio.com/products/rstudio/download/)
+which has all the tools you need to develop using R.
+
 Install the following library dependencies, on R console:
 ```
 > install.packages("dplyr", "testthat")
@@ -22,9 +26,9 @@ Or you can install under the "packages" tab on R Studio.
 
 ### Usage
 
-The [main.R](https://github.com/ufcg-lsd/autoscaling-analyser/blob/samara/src/main.R) file is where you want to start playing with the algorithm. 
+The [main.R](https://github.com/ufcg-lsd/autoscaling-analyser/blob/main/src/main.R) file is where you want to start playing with the algorithm. 
 You can add new data files, or you can use the one that we offer as sample: 
-[decreasing_data.csv](https://github.com/ufcg-lsd/autoscaling-analyser/blob/samara/data/decreasing_data.csv)
+[decreasing_data.csv](https://github.com/ufcg-lsd/autoscaling-analyser/blob/main/data/decreasing_data.csv)
 
 You can run the script on your terminal on the repo root directory, with the following command:
 ```
@@ -32,8 +36,26 @@ $ Rscript src/main.R data/$input_data
 ```
 Where the second argument is the path to the data file.
 
-We recommend you to use [RStudio IDE](https://www.rstudio.com/products/rstudio/download/)
-which has all the tools you need to develop using R.
+This will output the ADI on your terminal, the response will look like this:
+```
+[1] 414.3679
+```
+In addition, an output file is also generated which will be stored under the
+``/output`` directory.
+
+The output file will contain a table with the following columns:
+
+- **timestamp**: Timestamp column from input data.
+- **Cores**: Demanded cores for an application (Cores column from input data).
+- **ExceededCores**: Amount of cores that is not supported by the allocated
+infrastructure.
+- **SystemUtilization**: Percentage of demanded cores over allocated cores.
+- **AllocatedCores**: Actual allocated cores in the infrastructure.
+- **NewCores**: New cores with will be allocated on the next timestamp to meet
+the current system utilization requirement. It's value can be either zero, 
+the step size or -1 multiplied by the step size.
+- **OverUtilization**: Percentage of demanded cores over exceeded cores.
+- **ADI**: ADI metric on each timestamp.
 
 ### Configuration file
 
