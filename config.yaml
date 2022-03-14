@@ -1,9 +1,24 @@
 ---
- initial_allocated_cores: 2
- # Configs for master-data-api
- lower_bound: 25
- upper_bound: 50
- up_step_size: 16
- down_step_size: 4
- min_cap: 32
- max_cap: 240
+# Configs for master-data-api
+initial_allocated_cores: 2
+policies:
+  to_use: "reactive"
+  reactive:
+    src: "src/policies/reactive_static_policy.R"
+    fun: "reactive_static_policy"
+    lower_bound: 25
+    upper_bound: 50
+    up_step_size: 16
+    down_step_size: 4
+    min_cap: 32
+    max_cap: 240
+  conservative: 
+    src: "src/policies/conservative_static_policy.R"
+    fun: "conservative_static_policy"
+    lower_bound: 25
+    upper_bound: 50
+    up_step_size: 16
+    down_step_size: 4
+    min_cap: 32
+    max_cap: 240
+    evaluation_period: 5
