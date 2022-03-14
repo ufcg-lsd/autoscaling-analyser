@@ -1,7 +1,10 @@
 
 auto_scaling_algorithm <- function(data, initial_allocated_cores,
                                    policy_parameters){
+  
   cores_allocated <- initial_allocated_cores
+  cooldown_countdown <- 0
+  cooldown_cores <- 0
   
   for(row in 1:nrow(data)) {
     # Maximum system utilization is 100%
@@ -16,15 +19,26 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     data[row, "SystemUtilization"] <- system_utilization
     data[row, "AllocatedCores"] <- cores_allocated
     
-    new_cores <- policy_parameters$fun(
-      system_utilization,
-      policy_parameters[["upper_bound"]],
-      policy_parameters[["lower_bound"]],
-      policy_parameters[["up_step_size"]],
-      policy_parameters[["down_step_size"]],
-      data,
-      row
-    )
+    new_cores <- 0
+    if (cooldown_countdown == 0) {
+      
+      cooldown_cores <- policy_parameters$fun(system_utilization,
+                                              policy_parameters,
+                                              history = data["SystemUtilization"],
+                                              current = row)
+      
+      if (cooldown_cores != 0) {
+        cooldown_countdown <- policy_parameters$cooldown
+      }
+      
+    } else if (cooldown_countdown == 1) {
+      
+      new_cores <- cooldown_cores
+      cooldown_cores <- 0
+      
+    }
+    
+    cooldown_countdown <- max(0, cooldown_countdown - 1)
     
     # Minimum allocated cores is the min_cap, and maximum is max_cap
     cores_allocated <- min(max(cores_allocated + new_cores,
