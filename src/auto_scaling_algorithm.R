@@ -33,6 +33,7 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
       
     } else if (cooldown_countdown == 1) {
       
+      # The addition of new cores is done by the end of the cooldown period
       new_cores <- cooldown_cores
       cooldown_cores <- 0
       

@@ -14,8 +14,8 @@ processing_data <- function(filename){
     mutate(Used = InstanceCapacity * Average / 100) %>%
     group_by(timestamp) %>%
     summarise(Cores = sum(Used),
-              Allocated = sum(InstanceCapacity),
-              SystemRealUtilization = min((Cores/Allocated) * 100, 100))
+              RealAllocatedCores = sum(InstanceCapacity),
+              SystemRealUtilization = min((Cores/RealAllocatedCores) * 100, 100))
   
   return(data)
 }

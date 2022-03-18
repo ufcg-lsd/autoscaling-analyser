@@ -17,7 +17,16 @@ calculate_adi <- function(data, lower_bound, upper_bound){
       adi <- 0
     }
     
+    if(data[row,"SystemRealUtilization"] > upper_bound){
+      real_adi <- data[row,"SystemRealUtilization"] - upper_bound
+    }else if(data[row,"SystemRealUtilization"] < lower_bound){
+      real_adi <- lower_bound - data[row,"SystemRealUtilization"] 
+    } else{
+      real_adi <- 0
+    }
+    
     data[row, "ADI"] <- adi
+    data[row, "RealADI"] <- real_adi
   }
   
   return(data)

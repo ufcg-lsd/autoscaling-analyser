@@ -1,6 +1,9 @@
 ---
+input_file: "itallo/master_data_api_240222_ds-env139-stable.csv"
+output_file: "itallo/output_master_data_api_240222_ds-env139-stable.csv"
+metrics_output_file: "itallo/metrics_master_data_api_240222_ds-env139-stable.csv"
 # Configs for master-data-api
-initial_allocated_cores: 2
+initial_allocated_cores:
 policies:
   to_use: "conservative"
   reactive:
