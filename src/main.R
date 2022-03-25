@@ -1,13 +1,18 @@
 library(dplyr)
 library(yaml)
 library(yardstick)
+library(R.utils)
 
 source(here::here("src/data_processing.R"))
 source(here::here("src/auto_scaling_algorithm.R"))
 source(here::here("src/calculate_adi.R"))
 
+# Command line args
+args <- commandArgs(trailingOnly = TRUE, asValues = TRUE)
+config_file <- ifelse(is.null(args$config), "config.yaml", args$config)
+
 # Config file
-configs <- yaml.load_file("config.yaml")
+configs <- yaml.load_file(config_file)
 
 # Data files
 input_data <- processing_data(here::here(configs$input_file))
@@ -41,6 +46,7 @@ data_with_adi <- calculate_adi(data_with_auto_scaling,
 metrics <- tibble(
   SimulatedADI = sum(data_with_adi["ADI"]),
   RealADI = sum(data_with_adi["RealADI"]),
+  ADI_PDIFF = (SimulatedADI/RealADI - 1)*100,
   MAE = mae_vec(
     data_with_adi$RealAllocatedCores,
     data_with_adi$AllocatedCores
