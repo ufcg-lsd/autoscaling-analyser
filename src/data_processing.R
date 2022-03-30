@@ -24,13 +24,12 @@ aggregate_data_azure <- function(){
   files_workload <- list.files(path="data/azure/vm_cpu_readings_files", pattern="*.csv", full.names=TRUE, recursive=FALSE)
   for (file in files_workload){
     if(str_contains(file, "vm_cpu_readings-file")){
-      print(file)
       csv_to_add <- read.csv(file)
       colnames(csv_to_add) <- c("timestamp", "vm_id", "min_cpu", "max_cpu", "avg_cpu")
       write.table(csv_to_add, file = ("data/azure/vm_cpu_readings_files/aggregate.csv"), sep = ",",
                   append = TRUE, quote = FALSE,
                   col.names = !file.exists(("data/azure/vm_cpu_readings_files/aggregate.csv")), row.names = FALSE)
-    }
+     }
   }
 }
 
@@ -51,7 +50,7 @@ processing_data_azure <- function(filename_vm_table, filename_vm_cpu){
   data <- left_join %>% 
     mutate(Used = as.numeric(vm_virtual_core_count_bucket) * as.numeric(avg_cpu) / 100) %>%
     na.omit() %>%
-    group_by(timestamp, subscription_id) %>%
+    group_by(timestamp, deployment_id) %>%
     summarise(Cores = sum(Used))
   
   return(data)
