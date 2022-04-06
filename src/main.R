@@ -6,6 +6,10 @@ source(here::here("src/data_processing.R"))
 source(here::here("src/auto_scaling_algorithm.R"))
 source(here::here("src/calculate_adi.R"))
 source(here::here("src/split_data.R"))
+source(here::here("src/metrics/over_and_under_provisioning.R"))
+source(here::here("src/metrics/accuracy.R"))
+source(here::here("src/metrics/timeshare.R"))
+source(here::here("src/metrics/jitter.R"))
 
 # Config file
 configs <- yaml.load_file("config.yaml")
@@ -39,9 +43,14 @@ if(configs$data_source == 'azure'){
     data_with_adi <- calculate_adi(data_with_auto_scaling,
                                    policy_parameters[["lower_bound"]],
                                    policy_parameters[["upper_bound"]])
-
-    row_to_add <- data.frame(app, sum(data_with_adi["ADI"]))
-    colnames(row_to_add) <- c("deployment_id", "ADI")
+    data_with_provisioning <- calculate_over_and_under_provisioning(data_with_auto_scaling)
+    
+    acc <- calculate_acc(data_with_provisioning)
+    timeshare <- calculate_timeshare(data_with_provisioning)
+    jitter <- calculate_jitter(data_with_provisioning)
+    
+    row_to_add <- data.frame(app, sum(data_with_adi["ADI"]), acc[[1]], acc[[2]], timeshare[[1]], timeshare[[2]], jitter)
+    colnames(row_to_add) <- c("deployment_id", "ADI", "accuracy_over_provisioning", "accuracy_under_provisioning", "timeshare_over_provisioning","timeshare_under_provisioning", "jitter")
     write.table(row_to_add, file = "data/azure/output/metrics.csv", sep=',',
                 append = TRUE, quote = FALSE,
                 col.names = !file.exists("data/azure/output/metrics.csv"), row.names = FALSE)

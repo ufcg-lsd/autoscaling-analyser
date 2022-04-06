@@ -21,7 +21,7 @@ processing_data <- function(filename){
 
 # Aggregates files related to VM usage
 aggregate_data_azure <- function(){
-  files_workload <- list.files(path="data/azure/vm_cpu_readings_files", pattern="*.csv", full.names=TRUE, recursive=FALSE)
+  files_workload <- list.files(path="data/azure/vm_cpu_readings_files/", pattern="*.csv", full.names=TRUE, recursive=FALSE)
   for (file in files_workload){
     if(str_contains(file, "vm_cpu_readings-file")){
       csv_to_add <- read.csv(file)
