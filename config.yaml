@@ -1,7 +1,7 @@
 ---
-input_file: "experiments/master_data_api_240222_ds-env139-stable.csv"
-output_file: "experiments/warm_up/output_master_data_api_240222_ds-env139-stable.csv"
-metrics_output_file: "experiments/warm_up/metrics_master_data_api_240222_ds-env139-stable.csv"
+input_file: "path-to-input-file"
+output_file: "path-to-output-file"
+metrics_output_file: "path-to-output-metrics-file"
 # Configs for master-data-api
 initial_allocated_cores:
 policies:
