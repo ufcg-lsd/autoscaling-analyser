@@ -18,7 +18,6 @@ configs <- yaml.load_file(config_file)
 input_data <- processing_data(here::here(configs$input_file))
 
 # Config parameters
-
 if (is.null(configs$initial_allocated_cores)) {
 
   initial_allocated_cores <- as.integer(input_data[1, "RealAllocatedCores"])
