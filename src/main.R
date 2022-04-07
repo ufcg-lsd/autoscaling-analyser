@@ -31,7 +31,7 @@ if (is.null(configs$initial_allocated_cores)) {
 }
 
 
-policy_parameters <- configs$policies[[configs$policies$to_use]]
+policy_parameters <- configs$policies[[configs$policies$use]]
 source(here::here(policy_parameters$src))
 policy_parameters$fun <- get(policy_parameters$fun)
 

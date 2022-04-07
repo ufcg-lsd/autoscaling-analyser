@@ -1,11 +1,11 @@
 ---
-input_file: "itallo/master_data_api_240222_ds-env139-stable.csv"
-output_file: "itallo/output_master_data_api_240222_ds-env139-stable.csv"
-metrics_output_file: "itallo/metrics_master_data_api_240222_ds-env139-stable.csv"
+input_file: "experiments/master_data_api_240222_ds-env139-stable.csv"
+output_file: "experiments/warm_up/output_master_data_api_240222_ds-env139-stable.csv"
+metrics_output_file: "experiments/warm_up/metrics_master_data_api_240222_ds-env139-stable.csv"
 # Configs for master-data-api
 initial_allocated_cores:
 policies:
-  to_use: "conservative"
+  use: "conservative"
   reactive:
     src: "src/policies/reactive_static_policy.R"
     fun: "reactive_static_policy"
@@ -27,3 +27,5 @@ policies:
     max_cap: 240
     evaluation_period: 5
     cooldown: 6
+    warm_up_lb: 9
+    warm_up_ub: 12
