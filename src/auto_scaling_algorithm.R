@@ -4,11 +4,13 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
   
   cores_allocated <- initial_allocated_cores
   cooldown_countdown <- 0
-  cooldown_cores <- 0
+  adding_time <- -1
+  adding_cores <- 0
   
   for(row in 1:nrow(data)) {
     # Maximum system utilization is 100%
     system_utilization <- min((data[row,"Cores"]/cores_allocated) * 100, 100)
+    current_time <- data[row, "timestamp"]
     
     if (system_utilization == 100) {
       data[row, "ExceededCores"] <- data[row,"Cores"] - cores_allocated
@@ -20,22 +22,46 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     data[row, "AllocatedCores"] <- cores_allocated
     
     new_cores <- 0
-    if (cooldown_countdown == 0) {
+    if (adding_time == current_time) {
       
-      cooldown_cores <- policy_parameters$fun(system_utilization,
-                                              policy_parameters,
-                                              history = data["SystemUtilization"],
-                                              current = row)
+      new_cores <- adding_cores
+      adding_time <- -1
+      adding_cores <- 0
+      cooldown_countdown <- policy_parameters$cooldown
       
-      if (cooldown_cores != 0) {
+    }
+    
+    if (cooldown_countdown == 0 && adding_time == -1) {
+      
+      cores <- policy_parameters$fun(system_utilization,
+                                     policy_parameters,
+                                     history = data["SystemUtilization"],
+                                     current = row)
+      
+      
+      if (cores < 0) {
+        
+        # If cores are to be removed, they will be removed immediately.
+        # The cooldown period will start just after the removal.
+        
+        new_cores <- cores
         cooldown_countdown <- policy_parameters$cooldown
+        
+      } else if (cores > 0) {
+        
+        # If cores are to be added, they will have to wait a warm-up time.
+        # The cooldown period will start only after they are added.
+        
+        adding_time <-
+          current_time + round(runif(
+            1,
+            policy_parameters$warm_up_lb,
+            policy_parameters$warm_up_ub
+          )) * 60
+        
+        adding_cores <- cores
+        
       }
-      
-    } else if (cooldown_countdown == 1) {
-      
-      # The addition of new cores is done by the end of the cooldown period
-      new_cores <- cooldown_cores
-      cooldown_cores <- 0
       
     }
     
