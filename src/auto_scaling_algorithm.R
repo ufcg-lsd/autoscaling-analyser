@@ -1,8 +1,9 @@
 
 auto_scaling_algorithm <- function(data, initial_allocated_cores,
-                                   policy_parameters){
+                                   policy_parameters, time_parameters){
   
   cores_allocated <- initial_allocated_cores
+  cooldown_start <- -1
   cooldown_countdown <- 0
   adding_time <- -1
   adding_cores <- 0
@@ -22,16 +23,23 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     data[row, "AllocatedCores"] <- cores_allocated
     
     new_cores <- 0
+    
+    if (cooldown_start == current_time) {
+      
+      cooldown_countdown <- time_parameters$cooldown
+      cooldown_start <- -1
+      
+    }
+    
     if (adding_time == current_time) {
       
       new_cores <- adding_cores
       adding_time <- -1
       adding_cores <- 0
-      cooldown_countdown <- policy_parameters$cooldown
       
     }
     
-    if (cooldown_countdown == 0 && adding_time == -1) {
+    if (cooldown_countdown == 0) {
       
       cores <- policy_parameters$func(system_utilization,
                                      policy_parameters,
@@ -45,19 +53,23 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
         # The cooldown period will start just after the removal.
         
         new_cores <- cores
-        cooldown_countdown <- policy_parameters$cooldown
+        cooldown_countdown <- time_parameters$cooldown
         
       } else if (cores > 0) {
         
-        # If cores are to be added, they will have to wait a warm-up time.
-        # The cooldown period will start only after they are added.
+        # If cores are to be added: 
+        #   - they will have to wait for boot and warm-up times.
+        #   - the cooldown period will start only after the boot time.
         
-        adding_time <-
-          current_time + round(runif(
-            1,
-            policy_parameters$warm_up_lb,
-            policy_parameters$warm_up_ub
-          )) * 60
+        warmup_time <- round(runif(
+          1,
+          time_parameters$warm_up$min,
+          time_parameters$warm_up$max
+        ))
+        
+        cooldown_start <- current_time + time_parameters$boot * 60
+        
+        adding_time <- cooldown_start + warmup_time * 60
         
         adding_cores <- cores
         

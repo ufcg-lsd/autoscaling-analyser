@@ -34,9 +34,14 @@ policy_parameters <- configs$policies[[configs$policies$use]]
 source(here::here(policy_parameters$src))
 policy_parameters$func <- get(policy_parameters$func)
 
+time_parameters <- configs$time
+
 # Play around with util data
-data_with_auto_scaling <- auto_scaling_algorithm(input_data, initial_allocated_cores,
-                                                policy_parameters)
+data_with_auto_scaling <-
+  auto_scaling_algorithm(input_data,
+                         initial_allocated_cores,
+                         policy_parameters,
+                         time_parameters)
 
 data_with_adi <- calculate_adi(data_with_auto_scaling,
                                policy_parameters[["lower_bound"]],
