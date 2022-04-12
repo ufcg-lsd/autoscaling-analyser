@@ -33,7 +33,7 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     
     if (cooldown_countdown == 0 && adding_time == -1) {
       
-      cores <- policy_parameters$fun(system_utilization,
+      cores <- policy_parameters$func(system_utilization,
                                      policy_parameters,
                                      history = data["SystemUtilization"],
                                      current = row)

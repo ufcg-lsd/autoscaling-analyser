@@ -32,7 +32,7 @@ if (is.null(configs$initial_allocated_cores)) {
 
 policy_parameters <- configs$policies[[configs$policies$use]]
 source(here::here(policy_parameters$src))
-policy_parameters$fun <- get(policy_parameters$fun)
+policy_parameters$func <- get(policy_parameters$func)
 
 # Play around with util data
 data_with_auto_scaling <- auto_scaling_algorithm(input_data, initial_allocated_cores,
