@@ -35,23 +35,24 @@ if(configs$data_source == 'azure'){
 
   for(file in files){
     ifelse(!dir.exists(file.path("data/azure", "output")), dir.create(file.path("data/azure", "output")), FALSE)
-    util_data <- read_csv(file)
-    app <- util_data$deployment_id
-
-    data_with_auto_scaling <- auto_scaling_algorithm(util_data, initial_allocated_cores,
+    util_data_app <- read_csv(file)
+    app <- util_data_app$deployment_id
+    print(app)
+    data_with_auto_scaling <- auto_scaling_algorithm(util_data_app, initial_allocated_cores,
                                                      policy_parameters)
     data_with_adi <- calculate_adi(data_with_auto_scaling,
                                    policy_parameters[["lower_bound"]],
                                    policy_parameters[["upper_bound"]])
     data_with_provisioning <- calculate_over_and_under_provisioning(data_with_auto_scaling)
-    
-    acc <- calculate_acc(data_with_provisioning)
+ 
+
     timeshare <- calculate_timeshare(data_with_provisioning)
     jitter <- calculate_jitter(data_with_provisioning)
-    
+    acc <- calculate_acc(data_with_provisioning)
+
     row_to_add <- data.frame(app, sum(data_with_adi["ADI"]), acc[[1]], acc[[2]], timeshare[[1]], timeshare[[2]], jitter)
     colnames(row_to_add) <- c("deployment_id", "ADI", "accuracy_over_provisioning", "accuracy_under_provisioning", "timeshare_over_provisioning","timeshare_under_provisioning", "jitter")
-    write.table(row_to_add, file = "data/azure/output/metrics.csv", sep=',',
+    write.table(unique(row_to_add), file = "data/azure/output/metrics.csv", sep=',',
                 append = TRUE, quote = FALSE,
                 col.names = !file.exists("data/azure/output/metrics.csv"), row.names = FALSE)
   }
@@ -72,7 +73,5 @@ if(configs$data_source == 'azure'){
   
   
 }
-
-
 
 
