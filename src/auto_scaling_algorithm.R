@@ -1,7 +1,7 @@
 
 auto_scaling_algorithm <- function(data, initial_allocated_cores,
                                    policy_parameters, time_parameters){
-  
+
   cores_allocated <- initial_allocated_cores
   cooldown_start <- -1
   cooldown_countdown <- 0
@@ -25,30 +25,28 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     new_cores <- 0
     
     if (cooldown_start == current_time) {
-      
+      # TODO
       cooldown_countdown <- time_parameters$cooldown
       cooldown_start <- -1
       
     }
     
     if (adding_time == current_time) {
-      
+      # TODO
       new_cores <- adding_cores
-      adding_time <- -1
+      adding_time <- -1 # TODO Boot time
       adding_cores <- 0
-      
     }
     
     if (cooldown_countdown == 0) {
-      
       cores <- policy_parameters$func(system_utilization,
                                      policy_parameters,
                                      history = data["SystemUtilization"],
-                                     current = row)
+                                     current = row,
+                                     allocated = cores_allocated)
       
       
       if (cores < 0) {
-        
         # If cores are to be removed, they will be removed immediately.
         # The cooldown period will start just after the removal.
         

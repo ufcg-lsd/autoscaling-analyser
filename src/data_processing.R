@@ -19,3 +19,5 @@ processing_data <- function(filename){
   
   return(data)
 }
+
+# TODO adicionar a função de processamento de dados no yaml

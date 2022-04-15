@@ -36,33 +36,36 @@ policy_parameters$func <- get(policy_parameters$func)
 
 time_parameters <- configs$time
 
-# Play around with util data
 data_with_auto_scaling <-
   auto_scaling_algorithm(input_data,
                          initial_allocated_cores,
                          policy_parameters,
                          time_parameters)
 
-data_with_adi <- calculate_adi(data_with_auto_scaling,
-                               policy_parameters[["lower_bound"]],
-                               policy_parameters[["upper_bound"]])
+readr::write_csv(data_with_auto_scaling, here::here(configs$output_file))
 
-metrics <- tibble(
-  SimulatedADI = sum(data_with_adi["ADI"]),
-  RealADI = sum(data_with_adi["RealADI"]),
-  ADI_PDIFF = (SimulatedADI/RealADI - 1)*100,
-  MAE = mae_vec(
-    data_with_adi$RealAllocatedCores,
-    data_with_adi$AllocatedCores
-  ),
-  SMAPE = smape_vec(
-    data_with_adi$RealAllocatedCores,
-    data_with_adi$AllocatedCores
-  ),
-  PDIFF = (
-    sum(data_with_adi$AllocatedCores) - sum(data_with_adi$RealAllocatedCores)
-  ) / sum(data_with_adi$RealAllocatedCores) * 100
-)
-
-readr::write_csv(data_with_adi, here::here(configs$output_file))
-readr::write_csv(metrics, here::here(configs$metrics_output_file))
+if (configs$metrics) {
+  data_with_adi <- calculate_adi(data_with_auto_scaling,
+                                 policy_parameters[["lower_bound"]],
+                                 policy_parameters[["upper_bound"]])
+  
+  # TODO Criar um arquivo metrics em src/
+  metrics <- tibble(
+    SimulatedADI = sum(data_with_adi["ADI"]),
+    RealADI = sum(data_with_adi["RealADI"]),
+    ADI_PDIFF = (SimulatedADI/RealADI - 1)*100,
+    MAE = mae_vec(
+      data_with_adi$RealAllocatedCores,
+      data_with_adi$AllocatedCores
+    ),
+    SMAPE = smape_vec(
+      data_with_adi$RealAllocatedCores,
+      data_with_adi$AllocatedCores
+    ),
+    PDIFF = (
+      sum(data_with_adi$AllocatedCores) - sum(data_with_adi$RealAllocatedCores)
+    ) / sum(data_with_adi$RealAllocatedCores) * 100
+  )
+  
+  readr::write_csv(metrics, here::here(configs$metrics_output_file))
+}

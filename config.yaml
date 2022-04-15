@@ -1,8 +1,9 @@
 ---
-input_file: "path-to-input-file"
-output_file: "path-to-output-file"
-metrics_output_file: "path-to-output-metrics-file"
+input_file: "data/util_data.csv"
+output_file: "output/target_tracking_output.csv"
+metrics_output_file: "output/target_tracking_metrics.csv"
 initial_allocated_cores:
+metrics: False
 time:
   granularity: 60
   cooldown: 6
@@ -11,7 +12,7 @@ time:
     min: 9
     max: 12
 policies:
-  use: "conservative"
+  use: "target_tracking"
   reactive:
     src: "src/policies/reactive_static_policy.R"
     func: "reactive_static_policy"
@@ -31,3 +32,12 @@ policies:
     min_cap: 32
     max_cap: 240
     evaluation_period: 5
+  target_tracking:
+    src: "src/policies/target_tracking_policy.R"
+    func: "target_tracking_policy"
+    target_value: 40
+    min_cap: 32
+    max_cap: 240
+    scale_out_cooldown: 2
+    scale_in_cooldown: 8
+    scale_in_threshold: 10
