@@ -14,8 +14,15 @@ config_file <- ifelse(is.null(args$config), "config.yaml", args$config)
 # Config file
 configs <- yaml.load_file(config_file)
 
-# Data files
-input_data <- processing_data(here::here(configs$input_file))
+# Process data files
+if (is.null(configs$process_data_func)) {
+  # Data doesn't need to be treated
+  input_data <- read.csv(here::here(configs$input_file))
+} else  {
+  # Data need special treatment
+  configs$process_data_func <- get(configs$process_data_func)
+  input_data <- configs$process_data_func(here::here(configs$input_file))
+}
 
 # Config parameters
 if (is.null(configs$initial_allocated_cores)) {

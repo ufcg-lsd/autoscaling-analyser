@@ -12,7 +12,7 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     # Maximum system utilization is 100%
     system_utilization <- min((data[row,"Cores"]/cores_allocated) * 100, 100)
     current_time <- data[row, "timestamp"]
-    
+
     if (system_utilization == 100) {
       data[row, "ExceededCores"] <- data[row,"Cores"] - cores_allocated
     } else {

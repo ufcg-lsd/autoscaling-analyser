@@ -4,6 +4,7 @@ output_file: "output/target_tracking_output.csv"
 metrics_output_file: "output/target_tracking_metrics.csv"
 initial_allocated_cores:
 metrics: False
+process_data_func: 'process_util_data'
 time:
   granularity: 60
   cooldown: 6
@@ -12,7 +13,7 @@ time:
     min: 9
     max: 12
 policies:
-  use: "target_tracking"
+  use: "reactive"
   reactive:
     src: "src/policies/reactive_static_policy.R"
     func: "reactive_static_policy"
