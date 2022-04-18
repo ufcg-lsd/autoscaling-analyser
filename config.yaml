@@ -13,7 +13,7 @@ time:
     min: 9
     max: 12
 policies:
-  use: "reactive"
+  use: "target_tracking"
   reactive:
     src: "src/policies/reactive_static_policy.R"
     func: "reactive_static_policy"
@@ -39,6 +39,7 @@ policies:
     target_value: 40
     min_cap: 32
     max_cap: 240
-    scale_out_cooldown: 2
-    scale_in_cooldown: 8
+    scale_up_cooldown: 2
+    scale_down_cooldown: 8
     scale_in_threshold: 10
+    vm_cores: 4
