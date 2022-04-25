@@ -1,7 +1,7 @@
 # The reactive static policy reacts to the demand and scales up and down
 # based on upper and lower bound parameters. The scale happens at a fixed
 # step size.
-conservative_static_policy <- function(system_utilization, policy_parameters, ...){
+simple_scaling_policy <- function(system_utilization, policy_parameters, ...){
   
   arguments <- list(...)
   system_utilization <- unlist(arguments$history)

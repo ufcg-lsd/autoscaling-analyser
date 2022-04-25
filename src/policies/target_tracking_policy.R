@@ -11,12 +11,9 @@ target_tracking_policy <- function(system_utilization, policy_parameters, ...) {
   adjustment = (arguments$demanded_cores / target - allocated) / vm_cores
   
   new_cores <- 0
-  if(system_utilization > target){
-    # Scale out: increase system capacity
+  if(system_utilization > target || system_utilization < lower_threshold){
+    # Adjust amount of cores if it's outside of boundaries
     new_cores <- ceiling(adjustment)
-  } else if(system_utilization < lower_threshold){
-    # Scale in: decrease system capacity
-    new_cores <- floor(adjustment) * -1 # FIX: this doesn't imply in a multiple of vm_cores
   }
 
   return (new_cores)
