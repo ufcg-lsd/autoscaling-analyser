@@ -1,9 +1,9 @@
 ---
 input_file: "data/util_data.csv"
-output_file: "output/simple_scaling.csv"
+output_file: "output/target_tracking.csv"
 metrics_output_file: "output/simple_scaling_metrics.csv"
 initial_allocated_cores:
-metrics: True
+metrics: False
 process_data_func: 'process_util_data'
 time:
   granularity: 60
@@ -13,7 +13,7 @@ time:
     min: 9
     max: 12
 policies:
-  use: "simple_scaling"
+  use: "target_tracking"
   simple_scaling:
     src: "src/policies/simple_scaling_policy.R"
     func: "simple_scaling_policy"
@@ -27,10 +27,8 @@ policies:
   target_tracking:
     src: "src/policies/target_tracking_policy.R"
     func: "target_tracking_policy"
-    target_value: 40
-    min_cap: 32
-    max_cap: 240
-    scale_up_cooldown: 2
-    scale_down_cooldown: 8
+    target_value: 50
+    min_cap: 8
+    max_cap: 64
     scale_in_threshold: 10
     vm_cores: 4
