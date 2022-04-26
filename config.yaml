@@ -1,33 +1,34 @@
 ---
-input_file: "path-to-input-file"
-output_file: "path-to-output-file"
-metrics_output_file: "path-to-output-metrics-file"
+input_file: "data/util_data.csv"
+output_file: "output/target_tracking.csv"
+metrics_output_file: "output/simple_scaling_metrics.csv"
 initial_allocated_cores:
+metrics: False
+process_data_func: 'process_util_data'
 time:
   granularity: 60
-  cooldown: 6
+  cooldown: 4
   boot: 1
   warm_up:
     min: 9
     max: 12
 policies:
-  use: "conservative"
-  reactive:
-    src: "src/policies/reactive_static_policy.R"
-    func: "reactive_static_policy"
-    lower_bound: 25
-    upper_bound: 50
-    up_step_size: 16
-    down_step_size: 4
-    min_cap: 32
-    max_cap: 240
-  conservative: 
-    src: "src/policies/conservative_static_policy.R"
-    func: "conservative_static_policy"
-    lower_bound: 25
-    upper_bound: 50
-    up_step_size: 16
-    down_step_size: 4
-    min_cap: 32
-    max_cap: 240
-    evaluation_period: 5
+  use: "target_tracking"
+  simple_scaling:
+    src: "src/policies/simple_scaling_policy.R"
+    func: "simple_scaling_policy"
+    lower_bound: 40
+    upper_bound: 60
+    up_step_size: 2
+    down_step_size: 2
+    min_cap: 8
+    max_cap: 64
+    evaluation_period: 1
+  target_tracking:
+    src: "src/policies/target_tracking_policy.R"
+    func: "target_tracking_policy"
+    target_value: 50
+    min_cap: 8
+    max_cap: 64
+    scale_in_threshold: 10
+    vm_cores: 4

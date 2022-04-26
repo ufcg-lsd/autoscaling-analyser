@@ -1,6 +1,6 @@
 library(readr)
 
-processing_data <- function(filename){
+process_util_data <- function(filename){
   raw_data <- read.csv(filename)
   
   cpu_info <- read_csv(here::here("data/cpu_info.csv"), 
@@ -16,6 +16,6 @@ processing_data <- function(filename){
     summarise(Cores = sum(Used),
               RealAllocatedCores = sum(InstanceCapacity),
               SystemRealUtilization = min((Cores/RealAllocatedCores) * 100, 100))
-  
+
   return(data)
 }
