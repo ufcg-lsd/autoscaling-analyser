@@ -14,6 +14,7 @@ config_file <- ifelse(is.null(args$config), "config.yaml", args$config)
 # Config file
 configs <- yaml.load_file(config_file)
 
+
 # Process data files
 if (is.null(configs$process_data_func)) {
   # Data doesn't need to be treated
