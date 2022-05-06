@@ -2,6 +2,7 @@ library(dplyr)
 library(yaml)
 library(yardstick)
 library(R.utils)
+library(purrr)
 
 source(here::here("src/data_processing.R"))
 source(here::here("src/auto_scaling_algorithm.R"))
