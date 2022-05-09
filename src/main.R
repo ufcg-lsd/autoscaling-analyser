@@ -37,7 +37,6 @@ if (is.null(configs$initial_allocated_cores)) {
   
 }
 
-
 policy_parameters <- configs$policies[[configs$policies$use]]
 source(here::here(policy_parameters$src))
 policy_parameters$func <- get(policy_parameters$func)
