@@ -5,9 +5,6 @@ target_tracking_policy <- function(system_utilization, policy_parameters, ...) {
   # Arguments parameters
   arguments <- list(...)
   allocated <- arguments$allocated
-  scale_type <- arguments$scale_type
-  scale_type_up <- scale_type == "up" | scale_type == "both"
-  scale_type_down <- scale_type == "down" | scale_type == "both"
     
   # Policy parameters
   target <- policy_parameters$target_value
@@ -20,8 +17,7 @@ target_tracking_policy <- function(system_utilization, policy_parameters, ...) {
   adjustment <- ceiling(step_cores / vm_cores) * vm_cores
   
   new_cores <- 0
-  if(scale_type_up & system_utilization > target |
-     scale_type_down & system_utilization < lower_threshold){
+  if(system_utilization > target | system_utilization < lower_threshold){
     # Adjust amount of cores if it's outside of boundaries
     new_cores <- adjustment
   }

@@ -5,6 +5,8 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
   
   cooldown <- get_cooldown(policy_parameters$cooldown)
   
+  prior_cores <- 0
+  
   # Cooldown counters
   cooldown_up_start <- 0
   cooldown_countdown <- data.frame(
@@ -52,36 +54,50 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
       cooldown_up_start <- -1
     }
     
-    scale_type <- get_scale_type(cooldown_countdown)
+    # Scale operation based on policy 
+    cores <- policy_parameters$func(
+      system_utilization,
+      policy_parameters,
+      history = data["SystemUtilization"],
+      current = row,
+      allocated = cores_allocated
+    )
     
-    if (scale_type != "none") {
+    if (cores < 0) {
 
-      # Scale operation based on policy 
-      cores <- policy_parameters$func(
-        system_utilization,
-        policy_parameters,
-        scale_type = scale_type,
-        history = data["SystemUtilization"],
-        current = row,
-        allocated = cores_allocated
-      )
-      
-      if (cores < 0) {
+      if (cooldown_countdown$down == 0 && cooldown_countdown$up == 0) {
         new_cores <- new_cores + cores
         
         # If cores are to be removed, they will be removed immediately.
         # Minimum allocated cores is the min_cap, and maximum is max_cap
-        cores_allocated <- 
-          min(
-            max(cores_allocated + cores, policy_parameters[["min_cap"]]),
-            policy_parameters[["max_cap"]]
-          )
+        cores_allocated <-
+          min(max(cores_allocated + cores, policy_parameters[["min_cap"]]),
+              policy_parameters[["max_cap"]])
         
         # The cooldown period will start just after the removal.
         cooldown_countdown$down <- cooldown$down
-
-      } else if (cores > 0) {
+      }
+      
+    } else if (cores > 0) {
+      
+      add_cores <- cores
+      
+      if (cooldown_countdown$down != 0) cooldown_countdown$down <- 0
+      
+      if (cooldown_countdown$up != 0) {
         
+        if (add_cores > prior_cores) {
+          add_cores <- add_cores - prior_cores
+          cooldown_countdown$up <- 0
+        }
+        
+      }
+      
+      if (cooldown_countdown$up == 0) {
+        
+        new_cores <- new_cores + add_cores
+        prior_cores <- cores
+      
         # If cores are to be added: 
         #   - they will have to wait for boot and warm-up times.
         #   - the cooldown period will start only after the boot time.
@@ -94,7 +110,8 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
         
         cooldown_up_start <- current_time + time_parameters$boot * 60
         adding_time <- c(adding_time, cooldown_up_start + warmup_time * 60)
-        adding_cores <- c(adding_cores, cores)
+        adding_cores <- c(adding_cores, add_cores)
+        
       }
       
     }
@@ -107,21 +124,6 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
   }
   
   return(data)
-}
-
-get_scale_type <- function(cooldown_countdown) {
-  
-  if (cooldown_countdown$up == 0 & cooldown_countdown$down == 0) {
-    scale_type <- "both"
-  } else if (cooldown_countdown$up == 0) {
-    scale_type <- "up"
-  } else if (cooldown_countdown$down == 0) {
-    scale_type <- "down"
-  } else {
-    scale_type <- "none"
-  }
-
-  return (scale_type)
 }
 
 get_cooldown <- function(cooldown_param) {
