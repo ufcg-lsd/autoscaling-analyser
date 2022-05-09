@@ -52,6 +52,7 @@ data_with_auto_scaling <-
 readr::write_csv(data_with_auto_scaling, here::here(configs$output_file))
 
 if (configs$metrics) {
+  # TODO calculate metrics based on policy
   data_with_adi <- calculate_adi(data_with_auto_scaling,
                                  policy_parameters[["lower_bound"]],
                                  policy_parameters[["upper_bound"]])
