@@ -2,6 +2,7 @@
 auto_scaling_algorithm <- function(data, initial_allocated_cores,
                                    policy_parameters, time_parameters){
   cores_allocated <- initial_allocated_cores
+  warm_up <- time_parameters$warm_up
   
   cooldown <- get_cooldown(policy_parameters$cooldown)
   
@@ -86,14 +87,10 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
         #   - they will have to wait for boot and warm-up times.
         #   - the cooldown period will start only after the boot time.
         
-        warmup_time <- round(runif(
-          1,
-          time_parameters$warm_up$min,
-          time_parameters$warm_up$max
-        ))
-        
-        cooldown_up_start <- current_time + time_parameters$boot * 60
-        adding_time <- c(adding_time, cooldown_up_start + warmup_time * 60)
+        startup <- get_random_time(warm_up$startup)
+        boot <- get_random_time(warm_up$boot)
+        cooldown_up_start <- current_time + boot * 60 + startup * 60
+        adding_time <- c(adding_time, cooldown_up_start)
         adding_cores <- c(adding_cores, cores)
       }
       
@@ -143,4 +140,14 @@ get_cooldown <- function(cooldown_param) {
   )
   
   return (cooldown)
+}
+
+get_random_time <- function(time_parameter) {
+  random_time <- round(runif(
+    1,
+    time_parameter$min,
+    time_parameter$max
+  ))
+
+  return (random_time)
 }
