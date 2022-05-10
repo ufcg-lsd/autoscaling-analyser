@@ -5,6 +5,7 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
   
   cooldown <- get_cooldown(policy_parameters$cooldown)
   
+  # Cores allocated on the previous auto-scaling operation
   prior_cores <- 0
   
   # Cooldown counters
@@ -15,7 +16,7 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
   )
   
   adding_time <- c() # Timestaps when there is a scaling operation
-  adding_cores <- c()
+  adding_cores <- c() # Amount of cores to be added on the adding time
   
   for(row in 1:nrow(data)) {
     # Iterate over each timestamp
@@ -62,7 +63,7 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
       current = row,
       allocated = cores_allocated
     )
-    
+
     if (cores < 0) {
 
       if (cooldown_countdown$down == 0 && cooldown_countdown$up == 0) {
@@ -82,15 +83,13 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
       
       add_cores <- cores
       
+      # When scale up operations are triggered the scale-down cooldown ends
       if (cooldown_countdown$down != 0) cooldown_countdown$down <- 0
       
-      if (cooldown_countdown$up != 0) {
-        
-        if (add_cores > prior_cores) {
+      if (cooldown_countdown$up != 0 && add_cores > prior_cores) {
+          # If a larger scale up operation is triggered the cooldown ends
           add_cores <- add_cores - prior_cores
           cooldown_countdown$up <- 0
-        }
-        
       }
       
       if (cooldown_countdown$up == 0) {
