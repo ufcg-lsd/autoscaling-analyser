@@ -1,126 +1,105 @@
 
 auto_scaling_algorithm <- function(data, initial_allocated_cores,
                                    policy_parameters, time_parameters){
+  
+  
+  # Inicializa variáveis globais
+  
   cores_allocated <- initial_allocated_cores
+  
+  action_queue <- list()
   
   cooldown <- get_cooldown(policy_parameters$cooldown)
   
-  prior_cores <- 0
-  
-  # Cooldown counters
-  cooldown_up_start <- 0
-  cooldown_countdown <- data.frame(
-    up = 0,
-    down = 0
-  )
-  
-  adding_time <- c() # Timestaps when there is a scaling operation
-  adding_cores <- c()
+  cooldown_countdown <- new.env()
+  cooldown_countdown$up <- 0
+  cooldown_countdown$down <- 0
   
   for(row in 1:nrow(data)) {
-    # Iterate over each timestamp
+    
+    # Inicializa variáveis locais
+    
+    current_time <- data[row, "timestamp"]
     new_cores <- 0
     
-    if (length(adding_time) > 0 && adding_time[1] == current_time) {
+    # Execução de ações na fila
+    
+    action <- action_queue[[as.character(current_time)]]
+    if (!is.null(action)) {
       
-      new_cores <- adding_cores[1]
-      adding_time <- adding_time[-1]
-      adding_cores <- adding_cores[-1]
-
-      cores_allocated <- 
-        min(
-          max(cores_allocated + new_cores, policy_parameters[["min_cap"]]),
-          policy_parameters[["max_cap"]]
-        )
+      if (action == 'cup') {
+        cooldown_countdown$up <- cooldown$up
+      } else { # Aqui tem um problema se warm-up = 0
+        new_cores <- new_cores + action
+        
+        cores_allocated <-
+          min(max(cores_allocated + action, policy_parameters[["min_cap"]]),
+              policy_parameters[["max_cap"]])
+      }
       
-    }
-
-    # Maximum system utilization is 100%
-    system_utilization <- min((data[row,"Cores"]/cores_allocated) * 100, 100)
-    current_time <- data[row, "timestamp"]
-
-    if (system_utilization == 100) {
-      data[row, "ExceededCores"] <- data[row,"Cores"] - cores_allocated
-    } else {
-      data[row, "ExceededCores"] <- 0 
     }
     
+    # Cálculo da utilização
+    
+    system_utilization <- min((data[row, "Cores"] / cores_allocated) * 100, 100)
     data[row, "SystemUtilization"] <- system_utilization
-    data[row, "AllocatedCores"] <- cores_allocated
     
-    # Scale up countdown reset
-    if (cooldown_up_start == current_time) {
-      cooldown_countdown$up <- cooldown$up
-      cooldown_up_start <- -1
-    }
+    excedded_cores <- ifelse(
+      system_utilization == 100, 
+      data[row, "Cores"] - cores_allocated, 
+      0)
     
-    # Scale operation based on policy 
+    # Invocação da política de cores (incluindo verificação de cooldown)
+    
     cores <- policy_parameters$func(
       system_utilization,
       policy_parameters,
+      time_parameters,
       history = data["SystemUtilization"],
       current = row,
-      allocated = cores_allocated
+      allocated = cores_allocated,
+      cooldown = cooldown_countdown,
+      last_addition = action_queue[["-1"]]
     )
     
     if (cores < 0) {
-
-      if (cooldown_countdown$down == 0 && cooldown_countdown$up == 0) {
-        new_cores <- new_cores + cores
-        
-        # If cores are to be removed, they will be removed immediately.
-        # Minimum allocated cores is the min_cap, and maximum is max_cap
-        cores_allocated <-
-          min(max(cores_allocated + cores, policy_parameters[["min_cap"]]),
-              policy_parameters[["max_cap"]])
-        
-        # The cooldown period will start just after the removal.
-        cooldown_countdown$down <- cooldown$down
-      }
+      
+      new_cores <- new_cores + cores
+      
+      cores_allocated <-
+        min(max(cores_allocated + cores, policy_parameters[["min_cap"]]),
+            policy_parameters[["max_cap"]])
+      
+      cooldown_countdown$down <- cooldown$down
       
     } else if (cores > 0) {
+      warmup_time <- round(runif(
+        1,
+        time_parameters$warm_up$min,
+        time_parameters$warm_up$max
+      ))
       
-      add_cores <- cores
+      cooldown_up_start <- current_time + time_parameters$boot * 60
+      action_queue[as.character(cooldown_up_start)] <- "cup"
       
-      if (cooldown_countdown$down != 0) cooldown_countdown$down <- 0
+      adding_time <- cooldown_up_start + warmup_time * 60
+      action_queue[as.character(adding_time)] <- cores
       
-      if (cooldown_countdown$up != 0) {
-        
-        if (add_cores > prior_cores) {
-          add_cores <- add_cores - prior_cores
-          cooldown_countdown$up <- 0
-        }
-        
-      }
-      
-      if (cooldown_countdown$up == 0) {
-        
-        new_cores <- new_cores + add_cores
-        prior_cores <- cores
-      
-        # If cores are to be added: 
-        #   - they will have to wait for boot and warm-up times.
-        #   - the cooldown period will start only after the boot time.
-        
-        warmup_time <- round(runif(
-          1,
-          time_parameters$warm_up$min,
-          time_parameters$warm_up$max
-        ))
-        
-        cooldown_up_start <- current_time + time_parameters$boot * 60
-        adding_time <- c(adding_time, cooldown_up_start + warmup_time * 60)
-        adding_cores <- c(adding_cores, add_cores)
-        
-      }
+      action_queue["-1"] <- cores
       
     }
-
-    # Decrease cooldown countdowns
+    
+    # Update do dataframe data
+    
+    data[row, "AllocatedCores"] <- cores_allocated
+    data[row, "ExceededCores"] <- excedded_cores
+    data[row, "NewCores"] <- new_cores
+    
+    # Decremento do cooldown
+    
     cooldown_countdown$up <- max(0, cooldown_countdown$up - 1)
     cooldown_countdown$down <- max(0, cooldown_countdown$down - 1)
-
-    data[row, "NewCores"] <- new_cores
+    
   }
   
   return(data)

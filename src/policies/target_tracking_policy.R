@@ -4,7 +4,9 @@ target_tracking_policy <- function(system_utilization, policy_parameters, ...) {
 
   # Arguments parameters
   arguments <- list(...)
+  cooldown_countdown <- arguments$cooldown
   allocated <- arguments$allocated
+  last_addition <- arguments$last_addition
     
   # Policy parameters
   target <- policy_parameters$target_value
@@ -20,6 +22,20 @@ target_tracking_policy <- function(system_utilization, policy_parameters, ...) {
   if(system_utilization > target | system_utilization < lower_threshold){
     # Adjust amount of cores if it's outside of boundaries
     new_cores <- adjustment
+  }
+  
+  if (new_cores < 0) {
+    if (cooldown_countdown$up != 0 || cooldown_countdown$down != 0)
+      new_cores <- 0
+  } else if (new_cores > 0) {
+    if (cooldown_countdown$down != 0) {
+      cooldown_countdown$down <- 0
+    } else if (cooldown_countdown$up != 0) {
+      if (new_cores > last_addition) {
+        new_cores <- new_cores - last_addition
+        cooldown_countdown$up <- 0
+      } else new_cores <- 0
+    }
   }
   
   return (new_cores)
