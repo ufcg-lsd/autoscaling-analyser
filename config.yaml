@@ -1,7 +1,7 @@
 ---
 input_file: "data/util_data.csv"
-output_file: "output/cooldown_test.csv"
-metrics_output_file: "output/cooldown_test_metrics.csv"
+output_file: "output/simple_scaling_v2.csv"
+metrics_output_file: "output/simple_scaling_v2_metrics.csv"
 metrics: False
 initial_allocated_cores:
 process_data_func: 'process_util_data'
@@ -9,18 +9,19 @@ application_start_time:
   min: 9
   max: 12
 policies:
-  use: "target_tracking" # TODO tirar use de policies
+  use: "simple_scaling" # TODO tirar use de policies
   simple_scaling:
     src: "src/policies/simple_scaling_policy.R"
     func: "simple_scaling_policy"
-    lower_bound: 40
-    upper_bound: 60
-    up_step_size: 2
-    down_step_size: 2
-    min_cap: 8
-    max_cap: 64
-    evaluation_period: 1
-    cooldown: 4
+    lower_bound: 25
+    upper_bound: 50
+    step_type: "cores"
+    up_step_size: 16
+    down_step_size: 4
+    min_cap: 32
+    max_cap: 240
+    evaluation_period: 5
+    cooldown: 6
   target_tracking:
     src: "src/policies/target_tracking_policy.R"
     func: "target_tracking_policy"

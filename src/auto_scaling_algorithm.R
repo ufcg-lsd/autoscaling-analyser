@@ -2,15 +2,15 @@
 auto_scaling_algorithm <- function(data, initial_allocated_cores,
                                    policy_parameters, application_start_time){
   
-  
-  # Inicializa variáveis globais
-  
+  # Initialize global variables
   cores_allocated <- initial_allocated_cores
   
+  # Queue to keep track of cooldown and scaling actions
   action_queue <- list()
   
   cooldown <- get_cooldown(policy_parameters$cooldown)
   
+  # Countdown is env type because we need to change it's value inside the policy
   cooldown_countdown <- new.env()
   cooldown_countdown$up <- 0
   cooldown_countdown$down <- 0
@@ -26,8 +26,7 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     
     current_time <- data[row, "timestamp"]
     
-    # Execução de ações na fila
-    
+    # Execute queue actions
     action <- action_queue[[as.character(current_time)]]
     if (!is.null(action)) {
     
@@ -43,8 +42,7 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
       
     }
     
-    # Cálculo da utilização
-    
+    # Calculate utilization
     system_utilization <- min((data[row, "Cores"] / cores_allocated) * 100, 100)
     data[row, "SystemUtilization"] <- system_utilization
     
@@ -53,8 +51,7 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
       data[row, "Cores"] - cores_allocated, 
       0)
     
-    # Invocação da política de cores (incluindo verificação de cooldown)
-    
+    # Call auto-scaling policy (including cooldown verification))
     cores <- policy_parameters$func(
       system_utilization,
       policy_parameters,
@@ -82,18 +79,17 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
       action_queue[as.character(cooldown_up_start)] <- cores
       
       action_queue["-1"] <- cores
-      
+  
     }
     
-    # Update do dataframe data
-    
+    # Update data
     data[row, "AllocatedCores"] <- cores_allocated
     data[row, "ExceededCores"] <- excedded_cores
     data[row, "Decision"] <- cores
     data[row, "Action"] <- ifelse(is.null(action), 0, action)
     data[row, "CooldownUp"] <- cooldown_countdown$up
     data[row, "CooldownDown"] <- cooldown_countdown$down
-    
+
   }
   
   return(data)

@@ -2,6 +2,7 @@ library(dplyr)
 library(yaml)
 library(yardstick)
 library(R.utils)
+library(purrr)
 
 source(here::here("src/data_processing.R"))
 source(here::here("src/auto_scaling_algorithm.R"))
@@ -13,7 +14,6 @@ config_file <- ifelse(is.null(args$config), "config.yaml", args$config)
 
 # Config file
 configs <- yaml.load_file(config_file)
-
 
 # Process data files
 if (is.null(configs$process_data_func)) {
@@ -37,7 +37,6 @@ if (is.null(configs$initial_allocated_cores)) {
   
 }
 
-
 policy_parameters <- configs$policies[[configs$policies$use]]
 source(here::here(policy_parameters$src))
 policy_parameters$func <- get(policy_parameters$func)
@@ -53,6 +52,7 @@ data_with_auto_scaling <-
 readr::write_csv(data_with_auto_scaling, here::here(configs$output_file))
 
 if (configs$metrics) {
+  # TODO calculate metrics based on policy
   data_with_adi <- calculate_adi(data_with_auto_scaling,
                                  policy_parameters[["lower_bound"]],
                                  policy_parameters[["upper_bound"]])
