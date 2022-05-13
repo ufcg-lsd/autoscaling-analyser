@@ -41,13 +41,11 @@ policy_parameters <- configs$policies[[configs$policies$use]]
 source(here::here(policy_parameters$src))
 policy_parameters$func <- get(policy_parameters$func)
 
-time_parameters <- configs$time
-
 data_with_auto_scaling <-
   auto_scaling_algorithm(input_data,
                          initial_allocated_cores,
                          policy_parameters,
-                         time_parameters)
+                         configs$application_start_time)
 
 readr::write_csv(data_with_auto_scaling, here::here(configs$output_file))
 
