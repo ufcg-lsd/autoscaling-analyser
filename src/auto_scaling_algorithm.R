@@ -26,21 +26,14 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     
     current_time <- data[row, "timestamp"]
     
-    # Execute queue actions
-    action <- action_queue[[as.character(current_time)]]
-    if (!is.null(action)) {
-    
-      cores_allocated <-
-        min(max(cores_allocated + action, policy_parameters[["min_cap"]]),
-            policy_parameters[["max_cap"]])
-      
-      if (action < 0) {
-        cooldown_countdown$down <- cooldown$down
-      } else if (action > 0) { 
-        cooldown_countdown$up <- cooldown$up
-      }
-      
-    }
+    # Executa, se houver, uma ação na fila no momento atual
+    # E retorna a quantidade de cores alocados após a ação
+    cores_allocated <-
+      perform_action(current_time,
+                     action_queue,
+                     cooldown_countdown,
+                     cooldown,
+                     cores_allocated)
     
     # Calculate utilization
     system_utilization <- min((data[row, "Cores"] / cores_allocated) * 100, 100)
@@ -60,33 +53,17 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
       current = row,
       allocated = cores_allocated,
       cooldown = cooldown_countdown,
-      last_addition = action_queue[["-1"]]
+      last_addition = action_queue[["last"]]
     )
     
-    if (cores < 0) {
-      
-      adding_time <- current_time + 60
-      action_queue[as.character(adding_time)] <- cores
-      
-    } else if (cores > 0) {
-      start_time <- 1 + round(runif(
-        1,
-        application_start_time$min,
-        application_start_time$max
-      ))
-      
-      cooldown_up_start <- current_time + start_time * 60
-      action_queue[as.character(cooldown_up_start)] <- cores
-      
-      action_queue["-1"] <- cores
-  
-    }
+    action_queue <-
+      update_action_queue(cores, current_time, 
+                          application_start_time, action_queue)
     
     # Update data
     data[row, "AllocatedCores"] <- cores_allocated
     data[row, "ExceededCores"] <- excedded_cores
     data[row, "Decision"] <- cores
-    data[row, "Action"] <- ifelse(is.null(action), 0, action)
     data[row, "CooldownUp"] <- cooldown_countdown$up
     data[row, "CooldownDown"] <- cooldown_countdown$down
 
@@ -114,4 +91,50 @@ get_cooldown <- function(cooldown_param) {
   )
   
   return (cooldown)
+}
+
+perform_action <- function(current_time, action_queue, cooldown_countdown, cooldown, cores_allocated) {
+  
+  action <- action_queue[[as.character(current_time)]]
+  if (!is.null(action)) {
+    
+    cores_allocated <-
+      min(max(cores_allocated + action, policy_parameters[["min_cap"]]),
+          policy_parameters[["max_cap"]])
+    
+    if (action < 0) {
+      cooldown_countdown$down <- cooldown$down
+    } else if (action > 0) { 
+      cooldown_countdown$up <- cooldown$up
+    }
+    
+  }
+  
+  return(cores_allocated)
+  
+}
+
+update_action_queue <- function(cores, current_time, application_start_time, action_queue) {
+  
+  if (cores < 0) {
+    
+    adding_time <- current_time + 60
+    action_queue[as.character(adding_time)] <- cores
+    
+  } else if (cores > 0) {
+    start_time <- 1 + round(runif(
+      1,
+      application_start_time$min,
+      application_start_time$max
+    ))
+    
+    cooldown_up_start <- current_time + start_time * 60
+    action_queue[as.character(cooldown_up_start)] <- cores
+    
+    action_queue["last"] <- cores
+    
+  }
+  
+  return(action_queue)
+  
 }
