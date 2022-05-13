@@ -5,12 +5,9 @@ metrics_output_file: "output/cooldown_test_metrics.csv"
 metrics: False
 initial_allocated_cores:
 process_data_func: 'process_util_data'
-time: # TODO application
-  granularity: 60
-  boot: 1 
-  warm_up:
-    min: 9
-    max: 12
+application_start_time:
+  min: 9
+  max: 12
 policies:
   use: "target_tracking" # TODO tirar use de policies
   simple_scaling:

@@ -7,7 +7,7 @@ simple_scaling_policy <- function(system_utilization, policy_parameters,
   arguments <- list(...)
   system_utilization <- unlist(arguments$history)
   current <- arguments$current
-  cooldown_countdown <- arguments$cooldown_countdown
+  cooldown_countdown <- arguments$cooldown
   
   start_time <- max(1, current-4)
   system_utilization <- system_utilization[start_time:current]
@@ -24,5 +24,5 @@ simple_scaling_policy <- function(system_utilization, policy_parameters,
   if (cooldown_countdown$up != 0 || cooldown_countdown$down != 0)
     new_cores <- 0
   
-  return (actions)
+  return (new_cores)
 }

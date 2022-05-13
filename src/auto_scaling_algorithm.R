@@ -1,6 +1,6 @@
 
 auto_scaling_algorithm <- function(data, initial_allocated_cores,
-                                   policy_parameters, time_parameters){
+                                   policy_parameters, application_start_time){
   
   
   # Inicializa variáveis globais
@@ -17,24 +17,28 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
   
   for(row in 1:nrow(data)) {
     
+    # Decremento do cooldown
+    
+    cooldown_countdown$up <- max(0, cooldown_countdown$up - 1)
+    cooldown_countdown$down <- max(0, cooldown_countdown$down - 1)
+    
     # Inicializa variáveis locais
     
     current_time <- data[row, "timestamp"]
-    new_cores <- 0
     
     # Execução de ações na fila
     
     action <- action_queue[[as.character(current_time)]]
     if (!is.null(action)) {
+    
+      cores_allocated <-
+        min(max(cores_allocated + action, policy_parameters[["min_cap"]]),
+            policy_parameters[["max_cap"]])
       
-      if (action == 'cup') {
+      if (action < 0) {
+        cooldown_countdown$down <- cooldown$down
+      } else if (action > 0) { 
         cooldown_countdown$up <- cooldown$up
-      } else { # Aqui tem um problema se warm-up = 0
-        new_cores <- new_cores + action
-        
-        cores_allocated <-
-          min(max(cores_allocated + action, policy_parameters[["min_cap"]]),
-              policy_parameters[["max_cap"]])
       }
       
     }
@@ -54,7 +58,7 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     cores <- policy_parameters$func(
       system_utilization,
       policy_parameters,
-      time_parameters,
+      application_start_time,
       history = data["SystemUtilization"],
       current = row,
       allocated = cores_allocated,
@@ -64,26 +68,18 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     
     if (cores < 0) {
       
-      new_cores <- new_cores + cores
-      
-      cores_allocated <-
-        min(max(cores_allocated + cores, policy_parameters[["min_cap"]]),
-            policy_parameters[["max_cap"]])
-      
-      cooldown_countdown$down <- cooldown$down
+      adding_time <- current_time + 60
+      action_queue[as.character(adding_time)] <- cores
       
     } else if (cores > 0) {
-      warmup_time <- round(runif(
+      start_time <- 1 + round(runif(
         1,
-        time_parameters$warm_up$min,
-        time_parameters$warm_up$max
+        application_start_time$min,
+        application_start_time$max
       ))
       
-      cooldown_up_start <- current_time + time_parameters$boot * 60
-      action_queue[as.character(cooldown_up_start)] <- "cup"
-      
-      adding_time <- cooldown_up_start + warmup_time * 60
-      action_queue[as.character(adding_time)] <- cores
+      cooldown_up_start <- current_time + start_time * 60
+      action_queue[as.character(cooldown_up_start)] <- cores
       
       action_queue["-1"] <- cores
       
@@ -93,12 +89,10 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     
     data[row, "AllocatedCores"] <- cores_allocated
     data[row, "ExceededCores"] <- excedded_cores
-    data[row, "NewCores"] <- new_cores
-    
-    # Decremento do cooldown
-    
-    cooldown_countdown$up <- max(0, cooldown_countdown$up - 1)
-    cooldown_countdown$down <- max(0, cooldown_countdown$down - 1)
+    data[row, "Decision"] <- cores
+    data[row, "Action"] <- ifelse(is.null(action), 0, action)
+    data[row, "CooldownUp"] <- cooldown_countdown$up
+    data[row, "CooldownDown"] <- cooldown_countdown$down
     
   }
   
