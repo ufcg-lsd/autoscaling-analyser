@@ -1,6 +1,6 @@
 ---
-input_file: "experiments/00-fake-data-validation/target_tracking.csv"
-output_file: "experiments/00-fake-data-validation/target_tracking_output_no_start.csv"
+input_file: "tests/target_tracking_test/target_tracking.csv"
+output_file: "tests/target_tracking_test/target_tracking_output.csv"
 metrics_output_file: "output/simple_scaling_v2_metrics.csv"
 metrics: False
 initial_allocated_cores: 20
