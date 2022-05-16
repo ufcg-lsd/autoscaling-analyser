@@ -1,0 +1,35 @@
+---
+input_file: "experiments/00-fake-data-validation/target_tracking.csv"
+output_file: "experiments/00-fake-data-validation/target_tracking_output_no_start.csv"
+metrics_output_file: "output/simple_scaling_v2_metrics.csv"
+metrics: False
+initial_allocated_cores: 20
+process_data_func:
+application_start_time:
+  min: 1
+  max: 1
+policies:
+  use: "target_tracking" # TODO tirar use de policies
+  simple_scaling:
+    src: "src/policies/simple_scaling_policy.R"
+    func: "simple_scaling_policy"
+    lower_bound: 25
+    upper_bound: 50
+    step_type: "cores"
+    up_step_size: 16
+    down_step_size: 4
+    min_cap: 32
+    max_cap: 240
+    evaluation_period: 5
+    cooldown: 6
+  target_tracking:
+    src: "src/policies/target_tracking_policy.R"
+    func: "target_tracking_policy"
+    target_value: 65
+    min_cap: 8
+    max_cap: 48
+    scale_in_threshold: 10
+    vm_cores: 4
+    cooldown:
+      up: 2
+      down: 2
