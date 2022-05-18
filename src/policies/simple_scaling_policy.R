@@ -29,7 +29,7 @@ simple_scaling_policy <- function(system_utilization, policy_parameters,
 get_system_utilization <- function(arguments, evaluation_period) {
   utilization_history <- unlist(arguments$history)
   current_time <- arguments$current
-  start_time <- max(1, current_time - evaluation_period - 1)
+  start_time <- max(1, current_time - (evaluation_period - 1))
   system_utilization <- utilization_history[start_time:current_time]
 
   return (system_utilization)

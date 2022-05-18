@@ -1,0 +1,35 @@
+---
+input_file: "tests/simple-scaling/simple_scaling.csv"
+output_file: "tests/simple-scaling/simple_scaling_output.csv"
+metrics_output_file: "output/simple_scaling_v2_metrics.csv"
+metrics: False
+initial_allocated_cores: 24
+process_data_func:
+application_start_time:
+  min: 1
+  max: 1
+policies:
+  use: "simple_scaling" # TODO tirar use de policies
+  simple_scaling:
+    src: "src/policies/simple_scaling_policy.R"
+    func: "simple_scaling_policy"
+    lower_bound: 30
+    upper_bound: 50
+    step_type: "cores"
+    up_step_size: 8
+    down_step_size: 8
+    min_cap: 20
+    max_cap: 52
+    evaluation_period: 1
+    cooldown: 3
+  target_tracking:
+    src: "src/policies/target_tracking_policy.R"
+    func: "target_tracking_policy"
+    target_value: 50
+    min_cap: 8
+    max_cap: 64
+    scale_in_threshold: 10
+    vm_cores: 4
+    cooldown:
+      up: 4
+      down: 6
