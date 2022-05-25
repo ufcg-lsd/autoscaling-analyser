@@ -1,6 +1,6 @@
 ---
 input_file: "tests/simple_scaling_test/simple_scaling.csv"
-output_file: "tests/simple_scaling_test/simple_scaling_simulation_output_v2.csv"
+output_file: "tests/simple_scaling_test/simulation_output.csv"
 metrics_output_file: ""
 metrics: False
 initial_allocated_cores: 24
