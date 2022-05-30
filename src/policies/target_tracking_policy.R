@@ -4,14 +4,13 @@ target_tracking_policy <- function(system_utilization, policy_parameters, ...) {
 
   # Arguments parameters
   arguments <- list(...)
+  cooldown_countdown <- arguments$cooldown
   allocated <- arguments$allocated
-  scale_type <- arguments$scale_type
-  scale_type_up <- scale_type == "up" | scale_type == "both"
-  scale_type_down <- scale_type == "down" | scale_type == "both"
+  last_addition <- arguments$last_addition
     
   # Policy parameters
   target <- policy_parameters$target_value
-  lower_threshold <- target - policy_parameters$scale_in_threshold
+  lower_threshold <- target * (1 - policy_parameters$scale_in_threshold/100)
   vm_cores <- policy_parameters$vm_cores
   
   # Calculate scaling adjustment
@@ -20,10 +19,23 @@ target_tracking_policy <- function(system_utilization, policy_parameters, ...) {
   adjustment <- ceiling(step_cores / vm_cores) * vm_cores
   
   new_cores <- 0
-  if(scale_type_up & system_utilization > target |
-     scale_type_down & system_utilization < lower_threshold){
+  if(system_utilization > target | system_utilization < lower_threshold){
     # Adjust amount of cores if it's outside of boundaries
     new_cores <- adjustment
+  }
+  
+  if (new_cores < 0) {
+    if (cooldown_countdown$up != 0 || cooldown_countdown$down != 0)
+      new_cores <- 0
+  } else if (new_cores > 0) {
+    if (cooldown_countdown$down != 0) {
+      cooldown_countdown$down <- 0
+    } else if (cooldown_countdown$up != 0) {
+      if (new_cores > last_addition) {
+        new_cores <- new_cores - last_addition
+        cooldown_countdown$up <- 0
+      } else new_cores <- 0
+    }
   }
   
   return (new_cores)

@@ -1,0 +1,23 @@
+---
+input_file: "tests/target_tracking_test/target_tracking.csv"
+output_file: "tests/target_tracking_test/simulation_output.csv"
+metrics_output_file: ""
+metrics: False
+initial_allocated_cores: 20
+process_data_func:
+application_start_time:
+  min: 1
+  max: 1
+policies:
+  use: "target_tracking"
+  target_tracking:
+    src: "src/policies/target_tracking_policy.R"
+    func: "target_tracking_policy"
+    target_value: 65
+    min_cap: 8
+    max_cap: 48
+    scale_in_threshold: 10
+    vm_cores: 4
+    cooldown:
+      up: 2
+      down: 2

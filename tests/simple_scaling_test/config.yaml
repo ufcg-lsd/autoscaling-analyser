@@ -1,0 +1,24 @@
+---
+input_file: "tests/simple_scaling_test/simple_scaling.csv"
+output_file: "tests/simple_scaling_test/simulation_output.csv"
+metrics_output_file: ""
+metrics: False
+initial_allocated_cores: 24
+process_data_func:
+application_start_time:
+  min: 1
+  max: 1
+policies:
+  use: "simple_scaling"
+  simple_scaling:
+    src: "src/policies/simple_scaling_policy.R"
+    func: "simple_scaling_policy"
+    lower_bound: 30
+    upper_bound: 50
+    step_type: "cores"
+    up_step_size: 8
+    down_step_size: 8
+    min_cap: 20
+    max_cap: 52
+    evaluation_period: 1
+    cooldown: 3
