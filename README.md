@@ -52,12 +52,19 @@ As a result, output file(s) will be generated based on your config settings.
 The repo structure is organized as follows:
 
 ```
+.
 ├── data/
-│   System monitoring data files that you want to evaluate.
+│   ├── Input data.
+├── output/
+│   ├── Output data.
 ├── src/
-│   The ADI Evaluation algorithm
-│   └── policies/
-│       Auto-scaling policies algorithms
+│   ├── Simulator source code.
+│   └── policies/
+│       ├── Policies source code. 
 └── tests/
-    Test cases to check if the algorithm is working as expected
+    ├── Common tests
+    ├── simple_scaling_test/
+    │   ├── Tests for simple scaling policy
+    └── target_tracking_test/
+        ├── Tests for target tracking policy
 ```
