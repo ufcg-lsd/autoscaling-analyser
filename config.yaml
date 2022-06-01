@@ -1,15 +1,15 @@
 ---
 input_file: "data/util_data.csv"
-output_file: "output/simple_scaling_v2.csv"
-metrics_output_file: "output/simple_scaling_v2_metrics.csv"
-metrics: False
+output_file: "output/simple_scaling.csv"
+metrics_output_file: "output/simple_scaling_metrics.csv"
+metrics: True
 initial_allocated_cores:
 process_data_func: 'process_util_data'
 application_start_time:
   min: 9
   max: 12
 policies:
-  use: "simple_scaling" # TODO tirar use de policies
+  use: "simple_scaling"
   simple_scaling:
     src: "src/policies/simple_scaling_policy.R"
     func: "simple_scaling_policy"
