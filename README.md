@@ -5,19 +5,8 @@
   src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQVQQd5Aj11dAHIbE0MzK46ll9rGyW8SgXQupbh2gAwdK4ltbPz" align="right" alt="AWS Auto Scaling Logo" width="100" height="100">
 
 ### Purpose
-The purpose of this project is to simulate auto-scaling policies using cloud
-traces.
-
-### Index
-
-- [Installation](#installation)
-- [Usage](#usage)
-- [Organization](#organization)
-- [Configuration](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Configuration)
-- [Input](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Input)
-- [Output](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Output)
-- [Policies](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Policies)
-- [Metrics](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Metrics)
+The purpose of this project is to implement and simulate auto-scaling policies.  
+So far, the simulator has the Simple Scaling and Target Tracking policies from AWS implemented.
 
 ### Installation
 
@@ -68,3 +57,11 @@ The repo structure is organized as follows:
     └── target_tracking_test/
         ├── Tests for target tracking policy
 ```
+
+### More information
+
+- [Configuration](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Configuration)
+- [Input](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Input)
+- [Output](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Output)
+- [Policies](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Policies)
+- [Metrics](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Metrics)
