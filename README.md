@@ -65,3 +65,4 @@ The repo structure is organized as follows:
 - [Output](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Output)
 - [Policies](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Policies)
 - [Metrics](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Metrics)
+- [Contributing](https://github.com/ufcg-lsd/autoscaling-analyser/wiki/Contributing)
