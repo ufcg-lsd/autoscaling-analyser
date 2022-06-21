@@ -15,7 +15,7 @@ process_util_data <- function(filename){
     group_by(timestamp) %>%
     summarise(Cores = sum(Used),
               RealAllocatedCores = sum(InstanceCapacity),
-              SystemRealUtilization = min((Cores/RealAllocatedCores) * 100, 100))
+              RealSystemUtilization = min((Cores/RealAllocatedCores) * 100, 100))
 
   return(data)
 }
