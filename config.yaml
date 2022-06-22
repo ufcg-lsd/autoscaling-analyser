@@ -5,6 +5,7 @@ metrics_output_file: "output/simple_scaling_v2_metrics.csv"
 metrics: False
 initial_allocated_cores:
 process_data_func: 'process_util_data'
+time_granularity: 300
 application_start_time:
   min: 9
   max: 12
@@ -33,3 +34,12 @@ policies:
     cooldown:
       up: 4
       down: 6
+  target_tracking_spot:
+    src: "src/policies/target_tracking_policy_spot.R"
+    func: "target_tracking_policy_spot"
+    target_value: 50
+    min_cap: 400
+    max_cap: 1200
+    scale_threshold: 10
+    vm_cores: 8
+    cooldown: 0

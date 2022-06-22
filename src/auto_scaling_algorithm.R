@@ -1,6 +1,7 @@
 
 auto_scaling_algorithm <- function(data, initial_allocated_cores,
-                                   policy_parameters, application_start_time){
+                                   policy_parameters, application_start_time,
+                                   time_granularity){
   
   # Initialize global variables
   cores_allocated <- initial_allocated_cores
@@ -8,7 +9,7 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
   # Queue to keep track of cooldown and scaling actions
   action_queue <- list()
   
-  cooldown <- get_cooldown(policy_parameters$cooldown)
+  cooldown <- get_cooldown(policy_parameters$cooldown, time_granularity)
   
   # Countdown is env type because we need to change it's value inside the policy
   cooldown_countdown <- new.env()
@@ -58,7 +59,8 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     
     action_queue <-
       update_action_queue(cores, current_time, 
-                          application_start_time, action_queue)
+                          application_start_time, action_queue,
+                          time_granularity)
     
     # Update data
     data[row, "AllocatedCores"] <- cores_allocated
@@ -72,7 +74,7 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
   return(data)
 }
 
-get_cooldown <- function(cooldown_param) {
+get_cooldown <- function(cooldown_param, time_granularity) {
   # TODO What if you don't add the cooldown param?
   if (is.atomic(cooldown_param)) {
     cooldown_up <- cooldown_param
@@ -86,8 +88,8 @@ get_cooldown <- function(cooldown_param) {
   }
   
   cooldown <- data.frame(
-    up = cooldown_up,
-    down = cooldown_down
+    up = cooldown_up %/% (time_granularity / 60),
+    down = cooldown_down %/% (time_granularity / 60)
   )
   
   return (cooldown)
@@ -114,15 +116,15 @@ perform_action <- function(current_time, action_queue, cooldown_countdown, coold
   
 }
 
-update_action_queue <- function(cores, current_time, application_start_time, action_queue) {
+update_action_queue <- function(cores, current_time, application_start_time, action_queue, time_granularity) {
   
   if (cores < 0) {
     
-    adding_time <- current_time + 60
+    adding_time <- current_time + time_granularity
     action_queue[as.character(adding_time)] <- cores
     
   } else if (cores > 0) {
-    start_time <- 1 + round(runif(
+    start_time <- (time_granularity %/% 60) + round(runif(
       1,
       application_start_time$min,
       application_start_time$max

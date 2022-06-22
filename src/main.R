@@ -45,7 +45,8 @@ data_with_auto_scaling <-
   auto_scaling_algorithm(input_data,
                          initial_allocated_cores,
                          policy_parameters,
-                         configs$application_start_time)
+                         configs$application_start_time,
+                         configs$time_granularity)
 
 readr::write_csv(data_with_auto_scaling, here::here(configs$output_file))
 
