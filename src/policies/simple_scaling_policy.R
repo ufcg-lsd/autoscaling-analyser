@@ -45,7 +45,7 @@ get_step_size <- function(policy_parameters, allocated) {
   step_type <- policy_parameters$step_type
   if (step_type == "percentage") {
     step_size$up <- round(step_size$up * allocated)
-    step_size$down <- round(step_size$down * allocated)
+    step_size$down <- round(step_size$down * allocated) * -1
   }
 
   return (step_size)
