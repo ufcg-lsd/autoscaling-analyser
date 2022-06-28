@@ -6,7 +6,7 @@ library(purrr)
 
 source(here::here("src/data_processing.R"))
 source(here::here("src/auto_scaling_algorithm.R"))
-source(here::here("src/calculate_adi.R"))
+source(here::here("src/metrics.R"))
 
 # Command line args
 args <- commandArgs(trailingOnly = TRUE, asValues = TRUE)
@@ -17,10 +17,10 @@ configs <- yaml.load_file(config_file)
 
 # Process data files
 if (is.null(configs$process_data_func)) {
-  # Data doesn't need to be treated
+  # Data doesn't need to be processed
   input_data <- read.csv(here::here(configs$input_file))
 } else  {
-  # Data need special treatment
+  # Data needs to be processed
   configs$process_data_func <- get(configs$process_data_func)
   input_data <- configs$process_data_func(here::here(configs$input_file))
 }
@@ -50,28 +50,6 @@ data_with_auto_scaling <-
 readr::write_csv(data_with_auto_scaling, here::here(configs$output_file))
 
 if (configs$metrics) {
-  # TODO calculate metrics based on policy
-  data_with_adi <- calculate_adi(data_with_auto_scaling,
-                                 policy_parameters[["lower_bound"]],
-                                 policy_parameters[["upper_bound"]])
-  
-  # TODO Criar um arquivo metrics em src/
-  metrics <- tibble(
-    SimulatedADI = sum(data_with_adi["ADI"]),
-    RealADI = sum(data_with_adi["RealADI"]),
-    ADI_PDIFF = (SimulatedADI/RealADI - 1)*100,
-    MAE = mae_vec(
-      data_with_adi$RealAllocatedCores,
-      data_with_adi$AllocatedCores
-    ),
-    SMAPE = smape_vec(
-      data_with_adi$RealAllocatedCores,
-      data_with_adi$AllocatedCores
-    ),
-    PDIFF = (
-      sum(data_with_adi$AllocatedCores) - sum(data_with_adi$RealAllocatedCores)
-    ) / sum(data_with_adi$RealAllocatedCores) * 100
-  )
-  
+  metrics <- calculate_metrics(data_with_auto_scaling, policy_parameters)
   readr::write_csv(metrics, here::here(configs$metrics_output_file))
 }
