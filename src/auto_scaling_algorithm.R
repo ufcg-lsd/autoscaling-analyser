@@ -1,10 +1,12 @@
 
 auto_scaling_algorithm <- function(data, initial_allocated_cores,
-                                   policy_parameters, application_start_time){
+                                   policy_parameters, application_start_time, scheduling){
   
   # Initialize global variables
   cores_allocated <- initial_allocated_cores
   
+  croniter <- import("croniter")
+  datetime <- import("datetime")
   # Queue to keep track of cooldown and scaling actions
   action_queue <- list()
   
@@ -26,6 +28,9 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     
     current_time <- data[row, "timestamp"]
     
+    if (!is.null(scheduling)) {
+      check_scheduling(current_time, scheduling, croniter, datetime)
+    }
     # Executa, se houver, uma ação na fila no momento atual
     # E retorna a quantidade de cores alocados após a ação
     cores_allocated <-
@@ -137,4 +142,12 @@ update_action_queue <- function(cores, current_time, application_start_time, act
   
   return(action_queue)
   
+}
+
+check_scheduling <- function(current_time, scheduling, croniter, datetime){
+  for(task in scheduling){
+    task$croniter <- croniter$croniter(task$cronExpression, datetime$datetime$fromtimestamp(as.integer(current_time)))
+    task$next_trigger <- task$croniter$get_next
+    print(task$next_trigger)
+  }
 }
