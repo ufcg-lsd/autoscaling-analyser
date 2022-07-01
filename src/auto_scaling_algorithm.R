@@ -4,12 +4,9 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
   
   # Initialize global variables
   cores_allocated <- initial_allocated_cores
-  
-  croniter <- import("croniter")
-  datetime <- import("datetime")
+  cron_parser <- reticulate::import_from_path('python_modules', path = here::here('src/.'))$cron_parser
   # Queue to keep track of cooldown and scaling actions
   action_queue <- list()
-  
   cooldown <- get_cooldown(policy_parameters$cooldown)
   
   # Countdown is env type because we need to change it's value inside the policy
@@ -29,7 +26,7 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     current_time <- data[row, "timestamp"]
     
     if (!is.null(scheduling)) {
-      check_scheduling(current_time, scheduling, croniter, datetime)
+      check_scheduling(current_time, scheduling, cron_parser)
     }
     # Executa, se houver, uma ação na fila no momento atual
     # E retorna a quantidade de cores alocados após a ação
@@ -144,10 +141,11 @@ update_action_queue <- function(cores, current_time, application_start_time, act
   
 }
 
-check_scheduling <- function(current_time, scheduling, croniter, datetime){
+check_scheduling <- function(current_time, scheduling, cron_parser){
   for(task in scheduling){
-    task$croniter <- croniter$croniter(task$cronExpression, datetime$datetime$fromtimestamp(as.integer(current_time)))
-    task$next_trigger <- task$croniter$get_next
-    print(task$next_trigger)
+    if(is.null(task$trigger)){
+      task$trigger <- cron_parser$cr_parser(task$cronExpression, current_time$timestamp)
+    }
+    print(task$trigger$get_next())
   }
 }
