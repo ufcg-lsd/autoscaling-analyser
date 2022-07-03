@@ -7,6 +7,7 @@ library(purrr)
 source(here::here("src/data_processing.R"))
 source(here::here("src/auto_scaling_algorithm.R"))
 source(here::here("src/metrics.R"))
+source(here::here("src/plot.R"))
 
 # Command line args
 args <- commandArgs(trailingOnly = TRUE, asValues = TRUE)
@@ -48,6 +49,10 @@ data_with_auto_scaling <-
                          configs$application_start_time)
 
 readr::write_csv(data_with_auto_scaling, here::here(configs$output_file))
+
+if (configs$plot) {
+  plot_simulation(data_with_auto_scaling, policy_parameters, configs)
+}
 
 if (configs$metrics) {
   metrics <- calculate_metrics(data_with_auto_scaling, policy_parameters)
