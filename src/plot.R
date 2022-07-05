@@ -1,4 +1,4 @@
-library(tidyverse)
+library(ggplot2)
 
 plot_simulation <- function(data, policy_parameters, configs) {
   utilization_plot_filepath <- configs$utilization_plot_file
