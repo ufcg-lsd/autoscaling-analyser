@@ -24,9 +24,20 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     # Inicializa variáveis locais
     
     current_time <- data[row, "timestamp"]
-    
-    if (!is.null(scheduling)) {
-      check_scheduling(current_time, scheduling, cron_parser)
+    if (!is.null(scheduling)) { 
+      tasks <- list()
+      for(task in scheduling){
+        if(is.null(task$trigger)){
+          task$trigger <- cron_parser$cr_parser(task$cronExpression, current_time$timestamp)
+          task$next_timestamp <- task$trigger$get_next()
+        }
+        if(current_time >= task$next_timestamp){
+          policy_parameters <- change_config(policy_parameters, task)
+          task$next_timestamp <- task$trigger$get_next()
+        }
+        tasks <- c(tasks, list(task))
+      }
+      scheduling <- tasks
     }
     # Executa, se houver, uma ação na fila no momento atual
     # E retorna a quantidade de cores alocados após a ação
@@ -141,11 +152,17 @@ update_action_queue <- function(cores, current_time, application_start_time, act
   
 }
 
-check_scheduling <- function(current_time, scheduling, cron_parser){
-  for(task in scheduling){
-    if(is.null(task$trigger)){
-      task$trigger <- cron_parser$cr_parser(task$cronExpression, current_time$timestamp)
-    }
-    print(task$trigger$get_next())
+change_config <- function(policy_parameters, task){
+  if(!is.null(task$scaleMinCapacity) && !is.na(task$scaleMinCapacity)){
+    policy_parameters$min_cap <- task$scaleMinCapacity    
   }
+  
+  if(!is.null(task$scaleMaxCapacity) && !is.na(task$scaleMaxCapacity)){
+    policy_parameters$max_cap <- task$scaleMaxCapacity    
+  }
+  
+  if(!is.null(task$scaleTargetCapacity) && !is.na(task$scaleTargetCapacity)){
+    policy_parameters$target_value <- task$scaleTargetCapacity    
+  }
+  policy_parameters
 }
