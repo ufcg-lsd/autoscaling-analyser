@@ -1,8 +1,8 @@
 ---
 input_file: "tests/simple_scaling_test/simple_scaling.csv"
 output_file: "tests/simple_scaling_test/simulation_output.csv"
-metrics_output_file: ""
 metrics: False
+plot: False
 initial_allocated_cores: 24
 process_data_func:
 application_start_time:
