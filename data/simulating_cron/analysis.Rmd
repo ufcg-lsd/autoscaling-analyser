@@ -1,0 +1,47 @@
+---
+title: "Análise de resultados"
+output: html_notebook
+---
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+theme_set(theme_bw())
+```
+
+```{r message=FALSE, warning=FALSE}
+with_cron <- read_csv("output_with_cron.csv")
+without_cron <- read_csv("output_without_cron.csv")
+```
+```{r}
+comparison <- data.frame(with_cron$timestamp, with_cron$RealAllocatedCores, with_cron$AllocatedCores, without_cron$AllocatedCores) 
+comparison <- comparison %>% 
+  rename(timestamp = with_cron.timestamp, real = with_cron.RealAllocatedCores, with_cron = with_cron.AllocatedCores, without_cron = without_cron.AllocatedCores) %>% 
+  mutate(date = as.POSIXct(timestamp, origin = "1970-01-01"))
+```
+
+```{r}
+comparison %>% 
+  pivot_longer(c(real, with_cron, without_cron)) %>% 
+  ggplot(aes(x = date, y = value, color = name)) +
+  geom_line() +
+  theme(legend.position = "bottom") 
+```
+```{r}
+comparison %>% 
+  pivot_longer(c(real, with_cron)) %>% 
+  ggplot(aes(x = date, y = value, color = name)) +
+  geom_line() +
+  theme(legend.position = "bottom") 
+```
+
+```{r}
+comparison %>% 
+  pivot_longer(c(real, without_cron)) %>% 
+  ggplot(aes(x = date, y = value, color = name)) +
+  geom_line() +
+  theme(legend.position = "bottom") 
+```
+
+
