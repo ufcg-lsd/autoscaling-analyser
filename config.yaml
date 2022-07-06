@@ -4,8 +4,6 @@ output_file: "output/simple_scaling.csv"
 metrics: False
 metrics_output_file: "output/simple_scaling_metrics.csv"
 plot: True
-utilization_plot_file: "output/simple_scaling_utilization.pdf"
-cores_plot_file: "output/simple_scaling_cores.pdf"
 initial_allocated_cores:
 process_data_func: 'process_util_data'
 application_start_time:

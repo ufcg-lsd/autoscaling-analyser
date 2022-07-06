@@ -1,10 +1,9 @@
 library(ggplot2)
 
 plot_simulation <- function(data, policy_parameters, configs) {
-  utilization_plot_filepath <- configs$utilization_plot_file
-  cores_plot_filepath <- configs$cores_plot_file
-
-  if (configs$policies$use == "simple_scaling") {
+  policy_name = configs$policies$use
+  
+  if (policy_name == "simple_scaling") {
     upper_bound <- policy_parameters$upper_bound
     lower_bound <-policy_parameters$lower_bound
     
@@ -17,7 +16,7 @@ plot_simulation <- function(data, policy_parameters, configs) {
       geom_hline(yintercept = lower_bound, color = "blue") +
       geom_text(aes(x = 70, y = lower_bound-2, label = "Lower Bound"), size = 3, color = "blue")
   
-  } else if (configs$policies$use == "target_tracking") {
+  } else if (policy_name == "target_tracking") {
     target <- policy_parameters$target_value
     
     data %>% ggplot2::ggplot(aes(x = timestamp - min(timestamp), y = SystemUtilization)) +
@@ -29,6 +28,7 @@ plot_simulation <- function(data, policy_parameters, configs) {
   
   }
 
+  utilization_plot_filepath <- paste("output/", policy_name, "_utilization.pdf", sep='')
   ggplot2::ggsave(utilization_plot_filepath, width = 7, height = 4)
   
   data %>% ggplot2::ggplot(aes(x = timestamp - min(timestamp), y = AllocatedCores)) +
@@ -36,6 +36,7 @@ plot_simulation <- function(data, policy_parameters, configs) {
     theme_minimal() +
     labs(y = "Cores", x = "Tempo (s)")
   
+  cores_plot_filepath <- paste("output/", policy_name, "_cores.pdf", sep='')
   ggplot2::ggsave(cores_plot_filepath, width = 7, height = 4)
   
 }
