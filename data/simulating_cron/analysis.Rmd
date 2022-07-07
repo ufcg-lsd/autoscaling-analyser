@@ -26,14 +26,16 @@ comparison %>%
   pivot_longer(c(real, with_cron, without_cron)) %>% 
   ggplot(aes(x = date, y = value, color = name)) +
   geom_line() +
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom") +
+  scale_x_datetime(date_breaks = "24 hours", date_labels = "%d\n%Hh")
 ```
 ```{r}
 comparison %>% 
   pivot_longer(c(real, with_cron)) %>% 
   ggplot(aes(x = date, y = value, color = name)) +
   geom_line() +
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom") +
+  scale_x_datetime(date_breaks = "24 hours", date_labels = "%d\n%Hh")
 ```
 
 ```{r}
@@ -41,7 +43,8 @@ comparison %>%
   pivot_longer(c(real, without_cron)) %>% 
   ggplot(aes(x = date, y = value, color = name)) +
   geom_line() +
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom") +
+  scale_x_datetime(date_breaks = "24 hours", date_labels = "%d\n%Hh")
 ```
 
 
