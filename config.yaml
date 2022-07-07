@@ -33,3 +33,13 @@ policies:
     cooldown:
       up: 4
       down: 6
+  predictive_scaling:
+    src: "src/policies/predictive_scaling_policy.R"
+    func: "predictive_scaling_policy"
+    train_file: "data/blablabla.csv"
+    min_cap: 8
+    max_cap: 64
+    vm_cores: 4
+    cooldown:
+      up: 4
+      down: 6
