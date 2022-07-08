@@ -13,7 +13,7 @@ predictive_scaling_policy <- function(system_utilization, policy_parameters, ...
   #Policy parameters
   train_file <- read_csv(policy_parameters$train_file)
   vm_cores <- policy_parameters$vm_cores
-  train_file <- bind_rows(train_file, used_cores)
+  train_file <- c(train_file, used_cores)
   
   horizon <- 12
   prediction_frame <- 21600

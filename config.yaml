@@ -1,15 +1,15 @@
 ---
-input_file: "data/util_data.csv"
-output_file: "output/simple_scaling.csv"
+input_file: "data/tcc/predict_file.csv"
+output_file: "data/tcc/results_file.csv"
 metrics_output_file: "output/simple_scaling_metrics.csv"
-metrics: True
+metrics: False
 initial_allocated_cores:
 process_data_func: 'process_util_data'
 application_start_time:
   min: 9
   max: 12
 policies:
-  use: "simple_scaling"
+  use: "predictive_scaling"
   simple_scaling:
     src: "src/policies/simple_scaling_policy.R"
     func: "simple_scaling_policy"
@@ -36,9 +36,9 @@ policies:
   predictive_scaling:
     src: "src/policies/predictive_scaling_policy.R"
     func: "predictive_scaling_policy"
-    train_file: "data/blablabla.csv"
-    min_cap: 8
-    max_cap: 64
+    train_file: "data/tcc/train_file.csv"
+    min_cap: 48
+    max_cap: 200
     vm_cores: 4
     cooldown:
       up: 4
