@@ -1,8 +1,8 @@
 ---
 input_file: "tests/target_tracking_test/target_tracking.csv"
 output_file: "tests/target_tracking_test/simulation_output.csv"
-metrics_output_file: ""
 metrics: False
+plot: False
 initial_allocated_cores: 20
 process_data_func:
 application_start_time:
