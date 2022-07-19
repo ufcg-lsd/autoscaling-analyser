@@ -37,9 +37,14 @@ if (is.null(configs$initial_allocated_cores)) {
   
 }
 
+
 policy_parameters <- configs$policies[[configs$policies$use]]
 source(here::here(policy_parameters$src))
 policy_parameters$func <- get(policy_parameters$func)
+
+if (configs$policies$use == "predictive_scaling") {
+  policy_parameters$train_file <- process_util_data(policy_parameters$train_file)
+}
 
 data_with_auto_scaling <-
   auto_scaling_algorithm(input_data,

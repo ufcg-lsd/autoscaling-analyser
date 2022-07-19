@@ -11,17 +11,18 @@ predictive_scaling_policy <- function(system_utilization, policy_parameters, ...
   cooldown_countdown <- arguments$cooldown
   
   #Policy parameters
-  test_file <- process_util_data(policy_parameters$train_file)
   vm_cores <- policy_parameters$vm_cores
-  train_file <- bind_rows(test_file, used_cores) %>% pull(Cores)
+  prediction_frame <- policy_parameters$prediction_frame
+  train_file <- bind_rows(policy_parameters$train_file, used_cores) %>% pull(Cores)
   
   horizon <- 12
-  prediction_frame <- 21600
-  start <- max(1, arguments$current - prediction_frame + 1)
-  end <- arguments$current + nrow(test_file)
+  start <- length(train_file) - prediction_frame
+  end <- length(train_file) - 1
   prediction <- forecast(auto.arima(train_file[start:end]), h=horizon)
   adjustment <- prediction$mean[length(prediction$mean)] - allocated
   new_cores <- ceiling(adjustment / vm_cores) * vm_cores
+  
+  print(arguments$current)
   
   if (cooldown_countdown$up != 0 || cooldown_countdown$down != 0)
     new_cores <- 0

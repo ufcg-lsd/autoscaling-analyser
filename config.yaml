@@ -1,6 +1,6 @@
 ---
-input_file: "data/tcc/predict_file.csv"
-output_file: "data/tcc/results_file.csv"
+input_file: "data/tcc/predict_file_139.csv"
+output_file: "data/tcc/results_file_139.csv"
 metrics_output_file: "output/simple_scaling_metrics.csv"
 metrics: False
 initial_allocated_cores:
@@ -36,7 +36,8 @@ policies:
   predictive_scaling:
     src: "src/policies/predictive_scaling_policy.R"
     func: "predictive_scaling_policy"
-    train_file: "data/tcc/train_file.csv"
+    train_file: "data/tcc/train_file_139.csv"
+    prediction_frame: 1440
     min_cap: 32
     max_cap: 240
     vm_cores: 4
