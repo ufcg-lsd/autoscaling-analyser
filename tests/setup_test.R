@@ -1,20 +1,32 @@
-# Load libraries
-library(dplyr)
 library(testthat)
 
-# Load source code
-source(here::here("src/auto_scaling_algorithm.R"))
-source(here::here("src/data_processing.R"))
-
-# Load data files
-data <- processing_data("tests/util_data.csv")
-data_decreasing <- read.csv("tests/decreasing_data.csv")
-
-adi_sum <- function(data, initial_allocated_cores, policy_parameters) {
-  data_with_auto_scaling <- auto_scaling_algorithm(data, initial_allocated_cores,
-                                                   policy_parameters)
-  data_with_adi <- calculate_adi(data_with_auto_scaling,
-                                 policy_parameters[["lower_bound"]],
-                                 policy_parameters[["upper_bound"]])
-  return (sum(data_with_adi["ADI"]))
+run_policy_test <- function(config_file, output_file, expected_file) {
+  
+  system(paste("Rscript", here::here("src/main.R"), "--config", here::here(config_file)))
+  real <- read.csv(here::here(output_file))
+  expected <- read.csv(here::here(expected_file))
+  
+  test_that("Same timestamp", {
+    expect_equal(real$timestamp, expected$timestamp)
+  })
+  
+  test_that("Same System Utilization", {
+    expect_equal(real$SystemUtilization, expected$SystemUtilization, tolerance = 1e-2)
+  })
+  
+  test_that("Same Allocated Cores", {
+    expect_equal(real$AllocatedCores, expected$AllocatedCores)
+  })
+  
+  test_that("Same Decisions", {
+    expect_equal(real$Decision, expected$Decision)
+  })
+  
+  test_that("Same Cooldown Up", {
+    expect_equal(real$CooldownUp, expected$CooldownUp)
+  })
+  
+  test_that("Same Cooldown Down", {
+    expect_equal(real$CooldownDown, expected$CooldownDown)
+  })
 }

@@ -13,7 +13,7 @@ calculate_adi <- function(data, lower_bound, upper_bound){
 
   # calculating ADI
   data$ADI = data$SystemUtilization %>% map_dbl(calculate_row_adi, L=lower_bound, U=upper_bound)
-  data$RealADI = data$SystemRealUtilization %>% map_dbl(calculate_row_adi, L=lower_bound, U=upper_bound)
+  data$RealADI = data$RealSystemUtilization %>% map_dbl(calculate_row_adi, L=lower_bound, U=upper_bound)
 
   # calculating ADI sign
   data <- data %>%
