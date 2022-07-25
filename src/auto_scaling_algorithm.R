@@ -46,7 +46,8 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
                      action_queue,
                      cooldown_countdown,
                      cooldown,
-                     cores_allocated)
+                     cores_allocated,
+                     policy_parameters)
     
     # Calculate utilization
     system_utilization <- min((data[row, "Cores"] / cores_allocated) * 100, 100)
@@ -106,9 +107,10 @@ get_cooldown <- function(cooldown_param) {
   return (cooldown)
 }
 
-perform_action <- function(current_time, action_queue, cooldown_countdown, cooldown, cores_allocated) {
+perform_action <- function(current_time, action_queue, cooldown_countdown, cooldown, cores_allocated, policy_parameters) {
   
   action <- action_queue[[as.character(current_time)]]
+  print(policy_parameters[["min_cap"]])
   if (!is.null(action)) {
     
     cores_allocated <-
