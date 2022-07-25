@@ -3,6 +3,8 @@ input_file: "data/promotions-env249.csv"
 output_file: "data/simulating_cron/output_without_cron.csv"
 metrics_output_file: "data/simulating_cron/metrics_with_cron.csv"
 metrics: False
+metrics_output_file: "output/simple_scaling_metrics.csv"
+plot: True
 initial_allocated_cores:
 process_data_func: 'process_util_data'
 application_start_time:

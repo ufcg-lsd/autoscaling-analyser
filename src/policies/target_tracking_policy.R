@@ -10,7 +10,7 @@ target_tracking_policy <- function(system_utilization, policy_parameters, ...) {
     
   # Policy parameters
   target <- policy_parameters$target_value
-  lower_threshold <- target - policy_parameters$scale_in_threshold
+  lower_threshold <- target * (1 - policy_parameters$scale_in_threshold/100)
   vm_cores <- policy_parameters$vm_cores
   
   # Calculate scaling adjustment
