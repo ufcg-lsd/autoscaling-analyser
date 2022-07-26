@@ -1,16 +1,28 @@
 library(ggplot2)
+library(tidyr)
+library(stringr)
+
+get_title <- function(data, policy_name) {
+  version <- data$Version[1]
+  date <- as.Date(data$date[1]) %>% str_replace_all("-", "/")
+  pretty_policy_name <- str_replace(policy_name, "_", " ") %>% str_to_title()
+  title <- paste(pretty_policy_name, "simulation from version", version,  "at", date)
+}
 
 plot_util <- function(data, policy_parameters, policy_name, filepath) {
-  version <- 55
-  date <- 15
-  title <- paste(policy_name, "Simulation from version", version,  "at", date)
+  title <- get_title(data, policy_name)
+  
+  data <- data %>%
+    rename(simulation = SystemUtilization, real = RealSystemUtilization) %>%
+    pivot_longer(c(simulation, real))
   
   plot <- data %>% ggplot(
-    aes(x = timestamp - min(timestamp), y = SystemUtilization)) +
+    aes(x = timestamp - min(timestamp), y = value, color = name)) +
     ggtitle(title) +
     geom_line() +
     theme_minimal() +
-    labs(y = "CPUtilization (%)", x = "Time (min)")
+    labs(y = "CPUtilization (%)", x = "Time (min)", color = "") +
+    theme(legend.position = "top", legend.direction = "horizontal")
   
   if (policy_name == "simple_scaling") {
     upper_bound <- policy_parameters$upper_bound
@@ -18,9 +30,9 @@ plot_util <- function(data, policy_parameters, policy_name, filepath) {
     
     plot <- plot +
       geom_hline(yintercept = upper_bound, color = "red") +
-      geom_text(aes(x = 70, y = upper_bound+2, label = "Upper Bound"), size = 3, color = "red") +
+      geom_text(aes(x = length(timestamp) %/% 2,y = upper_bound+2, label = "Upper Bound"), size = 2, color = "red") +
       geom_hline(yintercept = lower_bound, color = "blue") +
-      geom_text(aes(x = 70, y = lower_bound-2, label = "Lower Bound"), size = 3, color = "blue")
+      geom_text(aes(x = length(timestamp) %/% 2, y = lower_bound-2, label = "Lower Bound"), size = 2, color = "blue")
     
   } else if (policy_name == "target_tracking") {
     target <- policy_parameters$target_value
@@ -30,9 +42,6 @@ plot_util <- function(data, policy_parameters, policy_name, filepath) {
       geom_text(aes(x = 120, y = target+2, label = "Target threshold"), size = 3, color = "red")
     
   }
-  
-  # Real plot
-  plot <- plot + geom_line(aes(y = RealSystemUtilization), color = "green")
   
   ggplot2::ggsave(filepath, width = 7, height = 4)
 }
