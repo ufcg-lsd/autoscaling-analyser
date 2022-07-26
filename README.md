@@ -43,7 +43,6 @@ The repo structure is organized as follows:
 - **Initial allocated cores**: the amount of cores available initially for your application
 to run. During the simulation, the auto scaling algorithm will increase or decrease
 this value, based on the boundaries that you set.
-- **Scheduling**: cron configurations for when to increase or decrease the capacity of the application.
 - **Lower bound**: The minimum utilization level percentage of your application's cores
 - **Upper bound**: The maximum utilization level percentage of your application's cores
 - **Step size**: The amount of cores you want to add or remove on each auto scaling operation.
