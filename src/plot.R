@@ -1,6 +1,7 @@
 library(ggplot2)
 library(tidyr)
 library(stringr)
+library(lubridate)
 
 get_title <- function(data, policy_name) {
   version <- data$Version[1]
@@ -12,29 +13,34 @@ get_title <- function(data, policy_name) {
 plot_util <- function(data, policy_parameters, policy_name, filepath) {
   title <- get_title(data, policy_name)
   
+  # Rename plot legend
   data <- data %>%
     rename(simulation = SystemUtilization, real = RealSystemUtilization) %>%
     pivot_longer(c(simulation, real))
-  
+
+  # Creating plot
   plot <- data %>% ggplot(
-    aes(x = timestamp - min(timestamp), y = value, color = name)) +
+    aes(x = datetime, y = value, color = name)) +
     ggtitle(title) +
     geom_line() +
     theme_minimal() +
-    labs(y = "CPUtilization (%)", x = "Time (min)", color = "") +
-    theme(legend.position = "top", legend.direction = "horizontal")
+    labs(y = "CPUtilization (%)", x = "Time (hour)", color = "") +
+    theme(legend.position = "top", legend.direction = "horizontal") +
+    scale_x_datetime(date_breaks = "30 min", date_labels = "%H:%M")
   
   if (policy_name == "simple_scaling") {
+    # Draw a line for each threshold
     upper_bound <- policy_parameters$upper_bound
-    lower_bound <-policy_parameters$lower_bound
+    lower_bound <- policy_parameters$lower_bound
     
     plot <- plot +
       geom_hline(yintercept = upper_bound, color = "red") +
-      geom_text(aes(x = length(timestamp) %/% 2,y = upper_bound+2, label = "Upper Bound"), size = 2, color = "red") +
+      geom_text(aes(x = min(datetime),y = upper_bound+2, label = "Upper Bound"), size = 2, color = "red") +
       geom_hline(yintercept = lower_bound, color = "blue") +
-      geom_text(aes(x = length(timestamp) %/% 2, y = lower_bound-2, label = "Lower Bound"), size = 2, color = "blue")
-    
+      geom_text(aes(x = min(datetime), y = lower_bound-2, label = "Lower Bound"), size = 2, color = "blue")
+
   } else if (policy_name == "target_tracking") {
+    # Draw a line for target threshold
     target <- policy_parameters$target_value
     
     plot <- plot +
@@ -46,49 +52,25 @@ plot_util <- function(data, policy_parameters, policy_name, filepath) {
   ggplot2::ggsave(filepath, width = 7, height = 4)
 }
 
+plot_cores <- function(data, filepath) {
+  # Plot allocated cores over the time for both real and simulation
+  data %>% ggplot(aes(x = datetime, y = AllocatedCores)) +
+    geom_line() +
+    theme_minimal() +
+    labs(y = "Cores", x = "Tempo (min)") + 
+    scale_x_datetime(date_breaks = "30 min", date_labels = "%H:%M")
+
+  ggplot2::ggsave(filepath, width = 7, height = 4)
+}
+
 plot_simulation <- function(data, policy_parameters, configs) {
   policy_name = configs$policies$use
   utilization_plot_filepath <- configs$plot_utilization_output_file
   cores_plot_filepath <- configs$plot_cores_output_file
+  
+  # Add datetime column to make the plot more readable in time perspective
+  data <- data %>% mutate(datetime = as.POSIXct(timestamp, origin="1970-01-01"))
 
   plot_util(data, policy_parameters, policy_name, utilization_plot_filepath)
-  
-  # TODO plot cores
-  # data %>% ggplot(aes(x = timestamp - min(timestamp), y = AllocatedCores)) +
-  #   geom_line() +
-  #   theme_minimal() +
-  #   labs(y = "Cores", x = "Tempo (min)")
-  # 
-  # ggplot2::ggsave(cores_plot_filepath, width = 7, height = 4)
-}
-
-plot_real <- function(data, upper_bound, lower_bound) {
-  version <- 55
-  day <- 15
-  title <- paste("Version", version, "from", day)
-
-  # utilization_plot <- data %>% ggplot(
-  #   aes(x = timestamp - min(timestamp), y = RealSystemUtilization)) +
-  #   ggtitle(title) +
-  #   geom_line() +
-  #   theme_minimal() +
-  #   labs(y = "CPUtilization (%)", x = "Time (min)") +
-  #   geom_hline(yintercept = upper_bound, color = "red") +
-  #   geom_text(aes(x = 80, y = upper_bound+2, label = "Upper Bound"), size = 2, color = "red") +
-  #   geom_hline(yintercept = lower_bound, color = "blue") +
-  #   geom_text(aes(x = 80, y = lower_bound-2, label = "Lower Bound"), size = 2, color = "blue")
-  # 
-  # plot_filepath <- paste("output/experiments/utilization/", version, "_", day, ".pdf", sep='')
-  # ggplot2::ggsave(plot_filepath, width = 7, height = 4)
-
-  cores_plot <- data %>% ggplot(
-    aes(x = timestamp - min(timestamp) , y = RealAllocatedCores)) +
-    ggtitle(title) +
-    geom_line() +
-    theme_minimal() +
-    labs(x = "Time (min)", y = "Cores")
-
-  plot_filepath <- paste("output/experiments/cores/", version, "_", day, ".pdf", sep='')
-  ggplot2::ggsave(plot_filepath, width = 7, height = 4)
-
+  plot_cores(data, cores_plot_filepath)
 }

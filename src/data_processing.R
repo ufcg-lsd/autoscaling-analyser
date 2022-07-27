@@ -40,7 +40,7 @@ process_util_data_max <- function(filename){
   return(data)
 }
 
-process_experiment_data <- function(processed_data, version, day){
+process_experiment_data <- function(filename, version){
   # Read
   raw_data <- read.csv(filename)
   cpu_info <- read_csv(here::here("data/cpu_info.csv"),
@@ -64,7 +64,11 @@ process_experiment_data <- function(processed_data, version, day){
     mutate(date = as.POSIXct(timestamp, origin="1970-01-01")) %>% 
     mutate(timestamp_day = timestamp %/% 86400) %>%
     group_by(timestamp_day) %>% group_split()
-  data <- data_split_by_days[[day]]
   
-  return(data)
+  for (d in 1:length(data_split_by_days)) {
+    dayx <- data_split_by_days[[d]]
+    filepath <- paste("data/experiment_v",version, "_", d,".csv", sep = '')
+    readr::write_csv(dayx, here::here(filepath))
+  }
+  
 }
