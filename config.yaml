@@ -15,21 +15,29 @@ scheduling:
     scaleTargetCapacity: ~
     scaleMinCapacity: 80
     scaleMaxCapacity: ~
+    scaleStepSizeUp: ~
+    scaleStepSizeDown: ~
   task2:
     cronExpression: "45 8 * * *"
     scaleTargetCapacity: ~
     scaleMinCapacity: 128
     scaleMaxCapacity: ~
+    scaleStepSizeUp: ~
+    scaleStepSizeDown: ~
   task3:
     cronExpression: "0 9 * * *"
     scaleTargetCapacity: ~
     scaleMinCapacity: 224
     scaleMaxCapacity: ~
+    scaleStepSizeUp: ~
+    scaleStepSizeDown: ~
   task4:
     cronExpression: "15 9 * * *"
     scaleTargetCapacity: ~
     scaleMinCapacity: 320
     scaleMaxCapacity: ~
+    scaleStepSizeUp: ~
+    scaleStepSizeDown: ~
 policies:
   use: "target_tracking" # TODO tirar use de policies
   simple_scaling:

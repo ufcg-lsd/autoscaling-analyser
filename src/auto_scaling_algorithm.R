@@ -161,5 +161,13 @@ change_config <- function(policy_parameters, task){
   if(!is.null(task$scaleTargetCapacity) && !is.na(task$scaleTargetCapacity)){
     policy_parameters$target_value <- task$scaleTargetCapacity    
   }
+  
+  if(!is.null(task$scaleStepSizeUp) && !is.na(task$scaleStepSizeUp)){
+    policy_parameters$up_step_size <- task$scaleStepSizeUp    
+  }
+  
+  if(!is.null(task$scaleStepSizeDown) && !is.na(task$scaleStepSizeDown)){
+    policy_parameters$down_step_size <- task$scaleStepSizeDown   
+  }
   policy_parameters
 }
