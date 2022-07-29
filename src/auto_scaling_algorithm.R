@@ -107,7 +107,7 @@ get_cooldown <- function(cooldown_param) {
   return (cooldown)
 }
 
-perform_action <- function(current_time, action_queue, cooldown_countdown, cooldown, cores_allocated, policy_parameters) {
+perform_action <- function(current_time, action_queue, cores_allocated, policy_parameters) {
   
   action <- action_queue[[as.character(current_time)]]
   if (!is.null(action)) {
