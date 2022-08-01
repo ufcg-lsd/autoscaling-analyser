@@ -24,7 +24,7 @@ plot_util <- function(data, policy_parameters, title, filepath) {
     theme_minimal() +
     labs(y = "CPUtilization (%)", x = "Time (hour)", color = "") +
     theme(legend.position = "top", legend.direction = "horizontal") +
-    scale_x_datetime(date_breaks = "30 min", date_labels = "%H:%M")
+    scale_x_datetime(date_breaks = "2 hour", date_labels = "%H:%M")
   
   if (startsWith(title, "Simple Scaling")) {
     # Draw a line for each threshold
@@ -63,8 +63,8 @@ plot_cores <- function(data, title, filepath) {
     theme_minimal() +
     labs(y = "Cores", x = "Time (hour)", color = "") +
     theme(legend.position = "top", legend.direction = "horizontal") +
-    scale_x_datetime(date_breaks = "30 min", date_labels = "%H:%M")
-
+    scale_x_datetime(date_breaks = "2 hour", date_labels = "%H:%M")
+  
   ggplot2::ggsave(filepath, width = 7, height = 4)
 }
 
@@ -72,12 +72,11 @@ plot_simulation <- function(data, policy_parameters, configs) {
   # Creates two plots for cores and system utilization over time comparing
   # real and simulation results.
   title <- get_title(data, configs$policies$use)
-  utilization_plot_filepath <- configs$plot_utilization_output_file
-  cores_plot_filepath <- configs$plot_cores_output_file
+  # scale_datetime <- configs$plot$scale_datetime
 
   # Add datetime column to make the plot more readable in time perspective
   data <- data %>% mutate(datetime = as.POSIXct(timestamp, origin="1970-01-01"))
 
-  plot_util(data, policy_parameters, title, utilization_plot_filepath)
-  plot_cores(data, title, cores_plot_filepath)
+  plot_util(data, policy_parameters, title, configs$utilization_filepath)
+  plot_cores(data, title, configs$cores_filepath)
 }
