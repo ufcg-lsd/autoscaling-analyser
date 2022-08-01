@@ -10,7 +10,7 @@ get_title <- function(data, policy_name) {
   title <- paste(pretty_policy_name, "simulation from version", version,  "at", date)
 }
 
-plot_util <- function(data, policy_parameters, title, filepath) {
+plot_util <- function(data, policy_parameters, title, date_break, filepath) {
   # Rename plot legend
   data <- data %>%
     rename(simulation = SystemUtilization, real = RealSystemUtilization) %>%
@@ -24,7 +24,7 @@ plot_util <- function(data, policy_parameters, title, filepath) {
     theme_minimal() +
     labs(y = "CPUtilization (%)", x = "Time (hour)", color = "") +
     theme(legend.position = "top", legend.direction = "horizontal") +
-    scale_x_datetime(date_breaks = "2 hour", date_labels = "%H:%M")
+    scale_x_datetime(date_breaks = date_break, date_labels = "%H:%M")
   
   if (startsWith(title, "Simple Scaling")) {
     # Draw a line for each threshold
@@ -50,7 +50,7 @@ plot_util <- function(data, policy_parameters, title, filepath) {
   ggplot2::ggsave(filepath, width = 7, height = 4)
 }
 
-plot_cores <- function(data, title, filepath) {
+plot_cores <- function(data, title, date_break, filepath) {
   # Add plot both real and simulation
   data <- data %>%
     rename(simulation = AllocatedCores, real = RealAllocatedCores) %>%
@@ -63,7 +63,7 @@ plot_cores <- function(data, title, filepath) {
     theme_minimal() +
     labs(y = "Cores", x = "Time (hour)", color = "") +
     theme(legend.position = "top", legend.direction = "horizontal") +
-    scale_x_datetime(date_breaks = "2 hour", date_labels = "%H:%M")
+    scale_x_datetime(date_breaks = date_break, date_labels = "%H:%M")
   
   ggplot2::ggsave(filepath, width = 7, height = 4)
 }
@@ -72,11 +72,21 @@ plot_simulation <- function(data, policy_parameters, configs) {
   # Creates two plots for cores and system utilization over time comparing
   # real and simulation results.
   title <- get_title(data, configs$policies$use)
-  # scale_datetime <- configs$plot$scale_datetime
+  date_break <- get_plot_date_break(configs)
 
   # Add datetime column to make the plot more readable in time perspective
   data <- data %>% mutate(datetime = as.POSIXct(timestamp, origin="1970-01-01"))
 
-  plot_util(data, policy_parameters, title, configs$utilization_filepath)
-  plot_cores(data, title, configs$cores_filepath)
+  plot_util(data, policy_parameters, title, date_break, configs$utilization_filepath)
+  plot_cores(data, title, date_break, configs$cores_filepath)
+}
+
+get_plot_date_break <- function(configs) {
+  if (is.null(configs$plot_scale_datetime)) {
+    date_break <- "1 hour"
+  } else {
+    date_break <- configs$plot_scale_datetime
+  }
+  
+  return (date_break)
 }
