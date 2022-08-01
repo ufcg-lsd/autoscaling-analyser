@@ -1,6 +1,9 @@
 # Library to implement utility functions
 
 generate_output_filepaths <- function(configs) {
+  # If the directory doesn't exists it is created
+  dir.create(configs$output_directory)
+  
   # Generate output base filepath
   output_basename <- str_split(basename(configs$input_file), '[.]')[[1]][1]
   output_base_filepath <- paste(configs$output_directory, output_basename, sep='')
