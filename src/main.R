@@ -3,7 +3,7 @@ library(yaml)
 library(yardstick)
 library(R.utils)
 library(purrr)
-
+library(reticulate)
 source(here::here("src/data_processing.R"))
 source(here::here("src/auto_scaling_algorithm.R"))
 source(here::here("src/metrics.R"))
@@ -46,7 +46,8 @@ data_with_auto_scaling <-
   auto_scaling_algorithm(input_data,
                          initial_allocated_cores,
                          policy_parameters,
-                         configs$application_start_time)
+                         configs$application_start_time,
+                         configs$scheduling)
 
 readr::write_csv(data_with_auto_scaling, here::here(configs$output_file))
 
@@ -58,3 +59,4 @@ if (configs$metrics) {
   metrics <- calculate_metrics(data_with_auto_scaling, policy_parameters)
   readr::write_csv(metrics, here::here(configs$metrics_output_file))
 }
+

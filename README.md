@@ -17,9 +17,14 @@ which has all the tools you need to develop using R.
 
 Install the following library dependencies, on R console:
 ```
-> install.packages("dplyr", "testthat", "yaml", "yardstick", "R.utils", "purrr")
+> install.packages("dplyr", "testthat", "yaml", "yardstick", "R.utils", "purrr", "reticulate")
 ```
 Or you can install under the "packages" tab on R Studio.
+
+You also need [croniter](), which is a python package and is installed as follows:
+```
+$ pip install croniter
+```
 
 ### Usage
 

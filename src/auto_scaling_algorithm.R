@@ -1,13 +1,12 @@
 
 auto_scaling_algorithm <- function(data, initial_allocated_cores,
-                                   policy_parameters, application_start_time){
+                                   policy_parameters, application_start_time, scheduling){
   
   # Initialize global variables
   cores_allocated <- initial_allocated_cores
-  
+  cron_parser <- reticulate::import_from_path('python_modules', path = here::here('src/.'))$cron_parser
   # Queue to keep track of cooldown and scaling actions
   action_queue <- list()
-  
   cooldown <- get_cooldown(policy_parameters$cooldown)
   
   # Countdown is env type because we need to change it's value inside the policy
@@ -25,13 +24,30 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     # Inicializa variáveis locais
     
     current_time <- data[row, "timestamp"]
-    
+    if (!is.null(scheduling)) { 
+      tasks <- list()
+      for(task in scheduling){
+        if(is.null(task$trigger)){
+          task$trigger <- cron_parser$cr_parser(task$cronExpression, current_time$timestamp)
+          task$next_timestamp <- task$trigger$get_next()
+        }
+        if(current_time >= task$next_timestamp){
+          policy_parameters <- change_config(policy_parameters, task)
+          task$next_timestamp <- task$trigger$get_next()
+        }
+        tasks <- c(tasks, list(task))
+      }
+      scheduling <- tasks
+    }
     # Executa, se houver, uma ação na fila no momento atual
     # E retorna a quantidade de cores alocados após a ação
     cores_allocated <-
       perform_action(current_time,
                      action_queue,
-                     cores_allocated)
+                     cooldown_countdown,
+                     cooldown,
+                     cores_allocated,
+                     policy_parameters)
     
     # Calculate utilization
     system_utilization <- min((data[row, "Cores"] / cores_allocated) * 100, 100)
@@ -91,7 +107,7 @@ get_cooldown <- function(cooldown_param) {
   return (cooldown)
 }
 
-perform_action <- function(current_time, action_queue, cores_allocated) {
+perform_action <- function(current_time, action_queue, cores_allocated, policy_parameters) {
   
   action <- action_queue[[as.character(current_time)]]
   if (!is.null(action)) {
@@ -131,4 +147,27 @@ update_action_queue <- function(cores, current_time, application_start_time, act
   
   return(action_queue)
   
+}
+
+change_config <- function(policy_parameters, task){
+  if(!is.null(task$scaleMinCapacity) && !is.na(task$scaleMinCapacity)){
+    policy_parameters$min_cap <- task$scaleMinCapacity    
+  }
+  
+  if(!is.null(task$scaleMaxCapacity) && !is.na(task$scaleMaxCapacity)){
+    policy_parameters$max_cap <- task$scaleMaxCapacity    
+  }
+  
+  if(!is.null(task$scaleTargetCapacity) && !is.na(task$scaleTargetCapacity)){
+    policy_parameters$target_value <- task$scaleTargetCapacity    
+  }
+  
+  if(!is.null(task$scaleStepSizeUp) && !is.na(task$scaleStepSizeUp)){
+    policy_parameters$up_step_size <- task$scaleStepSizeUp    
+  }
+  
+  if(!is.null(task$scaleStepSizeDown) && !is.na(task$scaleStepSizeDown)){
+    policy_parameters$down_step_size <- task$scaleStepSizeDown   
+  }
+  policy_parameters
 }
