@@ -1,11 +1,11 @@
 ---
-input_file: "data/util_data.csv"
-output_file: "output/simple_scaling.csv"
-metrics: False
-metrics_output_file: "output/simple_scaling_metrics.csv"
+input_file: "data/experiment_v55_13.csv"
+output_directory: "output/experiments/v55/13/"
+metrics: True
 plot: True
+plot_scale_datetime: "2 hour"
 initial_allocated_cores:
-process_data_func: 'process_util_data'
+process_data_func:
 application_start_time:
   min: 9
   max: 12
