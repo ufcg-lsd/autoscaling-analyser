@@ -44,8 +44,6 @@ auto_scaling_algorithm <- function(data, initial_allocated_cores,
     cores_allocated <-
       perform_action(current_time,
                      action_queue,
-                     cooldown_countdown,
-                     cooldown,
                      cores_allocated,
                      policy_parameters)
     
