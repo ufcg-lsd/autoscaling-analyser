@@ -1,5 +1,7 @@
 library(ggplot2)
 
+
+
 plot_simulation <- function(data, policy_parameters, configs) {
   policy_name = configs$policies$use
   plot <- data %>% ggplot(

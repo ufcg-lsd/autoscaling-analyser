@@ -1,11 +1,15 @@
 ---
+#source_data: "azure"
+azure_data:
+  folder_data: "data/azure"
 input_file: "data/util_data.csv"
 output_file: "output/simple_scaling.csv"
-metrics: False
-metrics_output_file: "output/simple_scaling_metrics.csv"
+metrics: True
+metrics_output_file: "output/metrics.csv"
 plot: True
-initial_allocated_cores:
-process_data_func: 'process_util_data'
+initial_allocated_cores: 4
+process_data_func: 'process_azure_data'
+#process_data_func: 'process_util_data'
 application_start_time:
   min: 9
   max: 12
@@ -13,14 +17,14 @@ scheduling:
   task1:
     cronExpression: "0 3 * * *"
     scaleTargetCapacity: ~
-    scaleMinCapacity: 80
+    scaleMinCapacity: 8
     scaleMaxCapacity: ~
     scaleStepSizeUp: ~
     scaleStepSizeDown: ~
   task2:
     cronExpression: "45 8 * * *"
     scaleTargetCapacity: ~
-    scaleMinCapacity: 128
+    scaleMinCapacity: 8
     scaleMaxCapacity: ~
     scaleStepSizeUp: ~
     scaleStepSizeDown: ~
@@ -34,28 +38,29 @@ scheduling:
   task4:
     cronExpression: "15 9 * * *"
     scaleTargetCapacity: ~
-    scaleMinCapacity: 320
+    scaleMinCapacity: 8
     scaleMaxCapacity: ~
     scaleStepSizeUp: ~
     scaleStepSizeDown: ~
 policies:
-  use: "target_tracking" # TODO tirar use de policies
+  use: "simple_scaling" # TODO tirar use de policies
+  #use: "target_tracking"
   simple_scaling:
     src: "src/policies/simple_scaling_policy.R"
     func: "simple_scaling_policy"
-    lower_bound: 25
-    upper_bound: 50
+    lower_bound: 20
+    upper_bound: 35
     step_type: "cores"
-    up_step_size: 16
-    down_step_size: 4
-    min_cap: 32
+    up_step_size: 2
+    down_step_size: 2
+    min_cap: 8
     max_cap: 240
-    evaluation_period: 5
-    cooldown: 6
+    evaluation_period: 1
+    cooldown: 1
   target_tracking:
     src: "src/policies/target_tracking_policy.R"
     func: "target_tracking_policy"
-    target_value: 45
+    target_value: 40
     min_cap: 320
     max_cap: 2560
     scale_in_threshold: 10
