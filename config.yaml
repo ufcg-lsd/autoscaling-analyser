@@ -1,5 +1,5 @@
 ---
-input_file: "data/util_data.csv"
+input_file: "data/decreasinng_data.csv"
 output_file: "output/simple_scaling.csv"
 metrics: False
 metrics_output_file: "output/simple_scaling_metrics.csv"

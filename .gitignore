@@ -3,6 +3,5 @@
 .RData
 .Ruserdata
 *.html
-data/util_data.csv
 experiments/
 src/python_modules/__pycache__/
