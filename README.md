@@ -17,7 +17,8 @@ which has all the tools you need to develop using R.
 
 Install the following library dependencies, on R console:
 ```
-> install.packages("dplyr", "testthat", "yaml", "yardstick", "R.utils", "purrr", "reticulate")
+> packages <- c("dplyr", "testthat", "yaml", "yardstick", "R.utils", "purrr", "reticulate")
+> install.packages(packages)
 ```
 Or you can install under the "packages" tab on R Studio.
 
