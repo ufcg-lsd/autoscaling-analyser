@@ -2,10 +2,6 @@
 
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white) ![R](https://img.shields.io/badge/r-%23276DC3.svg?style=for-the-badge&logo=r&logoColor=white)
 
-```{=html}
-<img 
-  src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQVQQd5Aj11dAHIbE0MzK46ll9rGyW8SgXQupbh2gAwdK4ltbPz" align="right" alt="AWS Auto Scaling Logo" width="100" height="100">
-```
 This project implements an Auto-Scaling Simulator. So far, the simulator has the implementation for AWS Simple Scaling and AWS Target Tracking policies of auto-scaling.
 
 ## Installation
