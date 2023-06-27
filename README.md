@@ -13,9 +13,11 @@ This project implements an Auto-Scaling Simulator. So far, the simulator has the
 2. Install the Python programming language (this can be done [here](https://www.python.org/downloads/)) and the [pip module](https://pip.pypa.io/en/stable/installation/).
 
 3. Install the following R libraries dependencies by typing the next command on R console:
-```r
-install.packages("dplyr", "testthat", "yaml", "yardstick", "R.utils", "purrr", "reticulate")
-```
+
+> packages <- c("dplyr", "testthat", "yaml", "yardstick", "R.utils", "purrr", "reticulate")
+> install.packages(packages)
+
+Or you can install under the "packages" tab on R Studio.
 
 4. Install the Python libraries dependencies using pip:
 ```bash
