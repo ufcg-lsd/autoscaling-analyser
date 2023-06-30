@@ -1,6 +1,6 @@
 library(readr)
 
-process_util_data <- function(filename){
+process_average_cores <- function(filename){
   raw_data <- read.csv(filename)
   
   cpu_info <- read_csv(here::here("data/cpu_info.csv"), 
@@ -21,7 +21,7 @@ process_util_data <- function(filename){
   return(data)
 }
 
-process_util_data_max <- function(filename){
+process_maximum_cores <- function(filename){
   raw_data <- read.csv(filename)
   
   cpu_info <- read_csv(here::here("data/cpu_info.csv"), 
